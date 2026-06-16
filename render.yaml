@@ -1,0 +1,25 @@
+# Blueprint de Render para el Hexagonal Panamá Pacífico.
+# Define un Web Service + una base de datos PostgreSQL NUEVOS e independientes.
+# Los nombres llevan el prefijo "hexagonal-pacifico" para no colisionar con
+# ningún otro proyecto existente en la cuenta (p. ej. porra-mundial).
+services:
+  - type: web
+    name: hexagonal-pacifico
+    runtime: node
+    plan: free
+    region: oregon
+    branch: main
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: hexagonal-pacifico-db
+          property: connectionString
+      - key: ADMIN_PASSWORD
+        sync: false
+
+databases:
+  - name: hexagonal-pacifico-db
+    plan: free
+    region: oregon

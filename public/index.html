@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hexagonal Panamá Pacífico</title>
+  <meta name="description" content="Torneo de fútbol Hexagonal Panamá Pacífico — Sport Park, Panamá Pacífico, 2026." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <!-- NAVBAR -->
+  <header class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="#inicio" class="brand">
+        <span class="brand-mark">HPP</span>
+        <span class="brand-text">Hexagonal Panamá Pacífico</span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Abrir menú">☰</button>
+      <nav class="nav-links" id="navLinks">
+        <a href="#inicio">Inicio</a>
+        <a href="#equipos">Equipos</a>
+        <a href="#calendario">Calendario</a>
+        <a href="#clasificacion">Clasificación</a>
+        <a href="#normativa">Normativa</a>
+        <a href="#admin">Admin</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero" id="inicio">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <p class="hero-kicker">Torneo de Fútbol · 2026</p>
+      <h1 class="hero-title">Hexagonal<br />Panamá Pacífico</h1>
+      <ul class="hero-meta">
+        <li><span>📍</span> Sport Park, Panamá Pacífico</li>
+        <li><span>📅</span> Inicio: Domingo 5 de julio de 2026</li>
+        <li><span>💵</span> Inscripción: 350 USD</li>
+      </ul>
+      <div class="hero-actions">
+        <a href="#calendario" class="btn btn-primary">Ver Calendario</a>
+        <a href="#clasificacion" class="btn btn-ghost">Clasificación</a>
+      </div>
+    </div>
+  </section>
+
+  <main>
+    <!-- EQUIPOS -->
+    <section class="section" id="equipos">
+      <div class="container">
+        <div class="section-head">
+          <span class="section-tag">06 Equipos</span>
+          <h2 class="section-title">Equipos Participantes</h2>
+        </div>
+        <div class="teams-grid" id="teamsGrid"><!-- JS --></div>
+      </div>
+    </section>
+
+    <!-- FORMATO -->
+    <section class="section section-alt" id="formato">
+      <div class="container">
+        <div class="section-head">
+          <span class="section-tag">El Torneo</span>
+          <h2 class="section-title">Formato de Competición</h2>
+        </div>
+        <div class="format-grid">
+          <div class="format-card">
+            <div class="format-icon">🏆</div>
+            <h3>Liguilla a una vuelta</h3>
+            <p>6 equipos, 5 jornadas. Todos contra todos una sola vez.</p>
+          </div>
+          <div class="format-card">
+            <div class="format-icon">🎯</div>
+            <h3>Clasifican los 4 primeros</h3>
+            <p>Los cuatro mejores avanzan a las semifinales (1º vs 4º y 2º vs 3º).</p>
+          </div>
+          <div class="format-card">
+            <div class="format-icon">⏱️</div>
+            <h3>2 tiempos de 30'</h3>
+            <p>Cada partido se juega a dos tiempos de treinta minutos.</p>
+          </div>
+          <div class="format-card">
+            <div class="format-icon">🌅</div>
+            <h3>3 turnos cada domingo</h3>
+            <p>7:00–8:00 am · 8:15–9:15 am · 9:30–10:30 am.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CALENDARIO -->
+    <section class="section" id="calendario">
+      <div class="container">
+        <div class="section-head">
+          <span class="section-tag">Fixture</span>
+          <h2 class="section-title">Calendario</h2>
+          <p class="section-sub">Partidos los domingos en Sport Park, Panamá Pacífico.</p>
+        </div>
+        <div id="scheduleWrap"><!-- JS --></div>
+      </div>
+    </section>
+
+    <!-- CLASIFICACIÓN -->
+    <section class="section section-alt" id="clasificacion">
+      <div class="container">
+        <div class="section-head">
+          <span class="section-tag">Tabla</span>
+          <h2 class="section-title">Clasificación</h2>
+          <p class="section-sub">Los 4 primeros (resaltados) clasifican a semifinales.</p>
+        </div>
+        <div class="table-scroll">
+          <table class="standings" id="standingsTable">
+            <thead>
+              <tr>
+                <th class="col-pos">#</th>
+                <th class="col-team">Equipo</th>
+                <th>PJ</th><th>G</th><th>E</th><th>P</th>
+                <th>GF</th><th>GC</th><th>DG</th>
+                <th title="Tarjetas rojas">🟥</th>
+                <th class="col-pts">PTS</th>
+              </tr>
+            </thead>
+            <tbody id="standingsBody"><!-- JS --></tbody>
+          </table>
+        </div>
+        <p class="standings-legend">
+          Criterios de desempate: 1) Head-to-head · 2) Diferencia de goles · 3) Goles a favor ·
+          4) Fair play (menos rojas) · 5) Sorteo.
+        </p>
+
+        <div class="section-head" style="margin-top:48px">
+          <span class="section-tag">Pichichi</span>
+          <h2 class="section-title">Máximos Goleadores</h2>
+        </div>
+        <div class="table-scroll">
+          <table class="scorers" id="scorersTable">
+            <thead>
+              <tr><th class="col-pos">#</th><th>Jugador</th><th>Equipo</th><th class="col-pts">Goles</th></tr>
+            </thead>
+            <tbody id="scorersBody"><!-- JS --></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- NORMATIVA -->
+    <section class="section" id="normativa">
+      <div class="container">
+        <div class="section-head">
+          <span class="section-tag">Reglamento</span>
+          <h2 class="section-title">Normativa del Torneo</h2>
+        </div>
+
+        <div class="rules">
+          <article class="rule-card">
+            <h3>1. Formato y clasificación</h3>
+            <p>Liguilla de una sola vuelta entre los 6 equipos. Clasifican los 4 primeros a semifinales:
+              <strong>1º vs 4º</strong> y <strong>2º vs 3º</strong>, a partido único. Los ganadores disputan la
+              <strong>final a partido único</strong>.</p>
+            <p>Criterios de desempate, en este orden:</p>
+            <ol>
+              <li>Resultado del partido disputado entre los equipos empatados (head-to-head).</li>
+              <li>Diferencia de goles.</li>
+              <li>Mayor número de goles a favor.</li>
+              <li>Fair play: menos tarjetas rojas.</li>
+              <li>Sorteo (si tras todos los criterios persiste el empate).</li>
+            </ol>
+          </article>
+
+          <article class="rule-card">
+            <h3>2. Uniformes</h3>
+            <p>Cada equipo debe comunicar a la organización el color o colores de su camiseta, pantalón y medias,
+              y debe cumplir con dicho uniforme. En casos excepcionales se aceptarán camiseta y pantalón del mismo
+              color que el uniforme principal, pero <strong>no se aceptarán camisetas de otros colores ni petos</strong>.</p>
+          </article>
+
+          <article class="rule-card">
+            <h3>3. Plantillas</h3>
+            <p>La plantilla puede ser dinámica: se permite incorporar jugadores a lo largo del torneo siempre que
+              vistan el uniforme correcto y se notifique a la organización.</p>
+          </article>
+
+          <article class="rule-card">
+            <h3>4. Disciplina y sanciones</h3>
+            <p>Una <strong>tarjeta roja</strong> conlleva 1 o 2 partidos de sanción según el motivo
+              (por ejemplo: agresión = 2 partidos; falta leve como derribo del último defensor = 1 partido).</p>
+            <p>La <strong>doble amarilla</strong> solo conlleva la expulsión del partido en cuestión, sin partido
+              adicional de suspensión.</p>
+            <p>La última palabra sobre las sanciones la tiene siempre la organización.</p>
+          </article>
+
+          <article class="rule-card">
+            <h3>5. Premios</h3>
+            <ul>
+              <li>🏆 Trofeo al equipo ganador.</li>
+              <li>⚽ Trofeo al máximo goleador.</li>
+              <li>🧤 Trofeo al portero menos goleado.</li>
+            </ul>
+          </article>
+
+          <article class="rule-card">
+            <h3>6. Logística</h3>
+            <p>Habrá hidratación disponible para los partidos.</p>
+          </article>
+        </div>
+
+        <!-- INSCRIPCIÓN -->
+        <div class="reg-card" id="inscripcion">
+          <div class="reg-left">
+            <span class="section-tag">Inscripción</span>
+            <h3>Cuota: <strong>350 USD</strong></h3>
+            <p>Asegura la participación de tu equipo realizando el pago a la siguiente cuenta.</p>
+          </div>
+          <div class="reg-right">
+            <div class="pay-row"><span>Cuenta</span><strong>04-72-00-733927-2</strong></div>
+            <div class="pay-row"><span>Banco</span><strong>Banco General</strong></div>
+            <div class="pay-row"><span>Tipo</span><strong>Ahorros</strong></div>
+            <div class="pay-row"><span>A nombre de</span><strong>Panama Pacífico FC</strong></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ADMIN -->
+    <section class="section section-alt" id="admin">
+      <div class="container">
+        <div class="section-head">
+          <span class="section-tag">Privado</span>
+          <h2 class="section-title">Panel de Administración</h2>
+        </div>
+
+        <!-- Login -->
+        <div class="admin-login card" id="adminLogin">
+          <h3>Acceso de administrador</h3>
+          <p class="muted">Introduce la contraseña para gestionar resultados, goleadores y tarjetas.</p>
+          <form id="loginForm" class="inline-form">
+            <input type="password" id="adminPassword" placeholder="Contraseña" autocomplete="current-password" required />
+            <button type="submit" class="btn btn-primary">Entrar</button>
+          </form>
+          <p class="form-msg" id="loginMsg"></p>
+        </div>
+
+        <!-- Panel -->
+        <div class="admin-panel" id="adminPanel" hidden>
+          <div class="admin-bar">
+            <span class="badge badge-ok">● Sesión activa</span>
+            <button class="btn btn-ghost btn-sm" id="logoutBtn">Cerrar sesión</button>
+          </div>
+
+          <div class="admin-tabs">
+            <button class="atab active" data-tab="resultados">Resultados</button>
+            <button class="atab" data-tab="goleadores">Goleadores</button>
+            <button class="atab" data-tab="tarjetas">Tarjetas</button>
+          </div>
+
+          <!-- Resultados -->
+          <div class="atab-panel" id="tab-resultados">
+            <p class="muted">Carga o edita el marcador de cada partido.</p>
+            <div id="adminResults"><!-- JS --></div>
+          </div>
+
+          <!-- Goleadores -->
+          <div class="atab-panel" id="tab-goleadores" hidden>
+            <form id="scorerForm" class="card admin-form">
+              <h4>Añadir goleador</h4>
+              <div class="form-grid">
+                <input type="text" id="scorerPlayer" placeholder="Nombre del jugador" required />
+                <select id="scorerTeam" required></select>
+                <input type="number" id="scorerGoals" placeholder="Goles" min="0" value="1" required />
+                <button type="submit" class="btn btn-primary">Añadir</button>
+              </div>
+              <p class="form-msg" id="scorerMsg"></p>
+            </form>
+            <div class="table-scroll">
+              <table class="admin-table">
+                <thead><tr><th>Jugador</th><th>Equipo</th><th>Goles</th><th></th></tr></thead>
+                <tbody id="adminScorersBody"><!-- JS --></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Tarjetas -->
+          <div class="atab-panel" id="tab-tarjetas" hidden>
+            <form id="cardForm" class="card admin-form">
+              <h4>Registrar tarjeta</h4>
+              <div class="form-grid">
+                <input type="text" id="cardPlayer" placeholder="Nombre del jugador" required />
+                <select id="cardTeam" required></select>
+                <select id="cardType" required>
+                  <option value="amarilla">🟨 Amarilla</option>
+                  <option value="roja">🟥 Roja</option>
+                </select>
+                <button type="submit" class="btn btn-primary">Registrar</button>
+              </div>
+              <p class="form-msg" id="cardMsg"></p>
+            </form>
+            <div class="table-scroll">
+              <table class="admin-table">
+                <thead><tr><th>Jugador</th><th>Equipo</th><th>Tarjeta</th><th></th></tr></thead>
+                <tbody id="adminCardsBody"><!-- JS --></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <strong>Hexagonal Panamá Pacífico</strong>
+      <span>Sport Park · Panamá Pacífico · 2026</span>
+    </div>
+  </footer>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
