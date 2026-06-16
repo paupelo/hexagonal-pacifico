@@ -1,0 +1,46 @@
+name: Deploy to Render
+
+# Despliega automáticamente en Render en cada push a main.
+# Sustituye al webhook nativo GitHub->Render (no disponible para este repo).
+# Usa la API de Render con secrets del repositorio:
+#   RENDER_API_KEY    -> API key de la cuenta de Render
+#   RENDER_SERVICE_ID -> id del Web Service hexagonal-pacifico
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render deploy
+        id: trigger
+        run: |
+          resp=$(curl -fsS -X POST \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys" \
+            -d '{"clearCache":"do_not_clear"}')
+          id=$(echo "$resp" | sed -n 's/.*"id":"\(dep-[^"]*\)".*/\1/p' | head -1)
+          echo "deploy_id=$id" >> "$GITHUB_OUTPUT"
+          echo "Lanzado deploy $id"
+
+      - name: Wait for deploy to go live
+        run: |
+          DEP="${{ steps.trigger.outputs.deploy_id }}"
+          SVC="${{ secrets.RENDER_SERVICE_ID }}"
+          for i in $(seq 1 60); do
+            status=$(curl -fsS \
+              -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+              "https://api.render.com/v1/services/$SVC/deploys/$DEP" \
+              | sed -n 's/.*"status":"\([a-z_]*\)".*/\1/p' | head -1)
+            echo "[$i] status: $status"
+            case "$status" in
+              live) echo "Deploy live"; exit 0 ;;
+              build_failed|update_failed|canceled|pre_deploy_failed|deactivated)
+                echo "Deploy fallido: $status"; exit 1 ;;
+            esac
+            sleep 10
+          done
+          echo "Timeout esperando el deploy"; exit 1
