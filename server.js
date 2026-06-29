@@ -75,8 +75,8 @@ const TEAMS = [
   'Panamá Pacífico Residentes FC',
   'Cludsa FC',
   'Colegio Francés',
-  'Deportivo Amarillo',
-  'Independiente Chorrera',
+  'Deportivo Amarillos',
+  'Hermandad FC',
   'New Generation PPFC',
 ];
 
@@ -90,7 +90,7 @@ const SCHEDULE = [
     matches: [
       { id: 'j1-1', time: '7:00', home: 'Colegio Francés', away: 'New Generation PPFC' },
       { id: 'j1-2', time: '8:15', home: 'Panamá Pacífico Residentes FC', away: 'Cludsa FC' },
-      { id: 'j1-3', time: '9:30', home: 'Deportivo Amarillo', away: 'Independiente Chorrera' },
+      { id: 'j1-3', time: '9:30', home: 'Deportivo Amarillos', away: 'Hermandad FC' },
     ],
   },
   {
@@ -100,8 +100,8 @@ const SCHEDULE = [
     type: 'liga',
     matches: [
       { id: 'j2-1', time: '7:00', home: 'Panamá Pacífico Residentes FC', away: 'Colegio Francés' },
-      { id: 'j2-2', time: '8:15', home: 'Independiente Chorrera', away: 'New Generation PPFC' },
-      { id: 'j2-3', time: '9:30', home: 'Cludsa FC', away: 'Deportivo Amarillo' },
+      { id: 'j2-2', time: '8:15', home: 'Hermandad FC', away: 'New Generation PPFC' },
+      { id: 'j2-3', time: '9:30', home: 'Cludsa FC', away: 'Deportivo Amarillos' },
     ],
   },
   {
@@ -110,9 +110,9 @@ const SCHEDULE = [
     date: 'Domingo 19 de julio de 2026',
     type: 'liga',
     matches: [
-      { id: 'j3-1', time: '7:00', home: 'Panamá Pacífico Residentes FC', away: 'Deportivo Amarillo' },
+      { id: 'j3-1', time: '7:00', home: 'Panamá Pacífico Residentes FC', away: 'Deportivo Amarillos' },
       { id: 'j3-2', time: '8:15', home: 'Cludsa FC', away: 'New Generation PPFC' },
-      { id: 'j3-3', time: '9:30', home: 'Colegio Francés', away: 'Independiente Chorrera' },
+      { id: 'j3-3', time: '9:30', home: 'Colegio Francés', away: 'Hermandad FC' },
     ],
   },
   {
@@ -121,8 +121,8 @@ const SCHEDULE = [
     date: 'Domingo 26 de julio de 2026',
     type: 'liga',
     matches: [
-      { id: 'j4-1', time: '7:00', home: 'Deportivo Amarillo', away: 'New Generation PPFC' },
-      { id: 'j4-2', time: '8:15', home: 'Panamá Pacífico Residentes FC', away: 'Independiente Chorrera' },
+      { id: 'j4-1', time: '7:00', home: 'Deportivo Amarillos', away: 'New Generation PPFC' },
+      { id: 'j4-2', time: '8:15', home: 'Panamá Pacífico Residentes FC', away: 'Hermandad FC' },
       { id: 'j4-3', time: '9:30', home: 'Cludsa FC', away: 'Colegio Francés' },
     ],
   },
@@ -132,8 +132,8 @@ const SCHEDULE = [
     date: 'Domingo 2 de agosto de 2026',
     type: 'liga',
     matches: [
-      { id: 'j5-1', time: '7:00', home: 'Cludsa FC', away: 'Independiente Chorrera' },
-      { id: 'j5-2', time: '8:15', home: 'Colegio Francés', away: 'Deportivo Amarillo' },
+      { id: 'j5-1', time: '7:00', home: 'Cludsa FC', away: 'Hermandad FC' },
+      { id: 'j5-2', time: '8:15', home: 'Colegio Francés', away: 'Deportivo Amarillos' },
       { id: 'j5-3', time: '9:30', home: 'Panamá Pacífico Residentes FC', away: 'New Generation PPFC' },
     ],
   },
