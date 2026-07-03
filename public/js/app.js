@@ -159,14 +159,13 @@ function renderStandings() {
   body.innerHTML = rows
     .map((r) => {
       const qualify = r.pos <= 4 ? 'qualify' : '';
-      const sorteo = r.sorteo ? `<span class="tag-sorteo">sorteo pendiente</span>` : '';
       return `
       <tr class="${qualify}">
         <td class="col-pos">${r.pos}</td>
         <td class="col-team">
           <div class="team-cell">
             <span class="dot">${badgeContent(r.team)}</span>
-            <span>${escapeHtml(r.team)}${sorteo}</span>
+            <span>${escapeHtml(r.team)}</span>
           </div>
         </td>
         <td>${r.pj}</td><td>${r.g}</td><td>${r.e}</td><td>${r.p}</td>

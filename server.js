@@ -403,27 +403,14 @@ function computeStandings(results, cards) {
         if (b.dg !== a.dg) return b.dg - a.dg;                              // 2) diferencia de goles
         if (b.gf !== a.gf) return b.gf - a.gf;                              // 3) goles a favor
         if (a.red !== b.red) return a.red - b.red;                          // 4) fair play (menos rojas)
-        return 0;                                                           // 5) sorteo
+        return a.team.localeCompare(b.team, 'es');                          // 5) orden alfabético
       });
-      // Marcar "sorteo pendiente" cuando dos equipos quedan totalmente iguales.
-      for (let k = 0; k < group.length; k++) {
-        const cur = group[k];
-        const prev = group[k - 1];
-        const next = group[k + 1];
-        const tiedWith = (o) =>
-          o &&
-          h2h[o.team] === h2h[cur.team] &&
-          o.dg === cur.dg &&
-          o.gf === cur.gf &&
-          o.red === cur.red;
-        cur.sorteo = tiedWith(prev) || tiedWith(next);
-      }
       ordered.push(...group);
     }
     i = j;
   }
 
-  return ordered.map((row, idx) => ({ ...row, pos: idx + 1, sorteo: !!row.sorteo }));
+  return ordered.map((row, idx) => ({ ...row, pos: idx + 1 }));
 }
 
 // --------------------------------------------------------------------------
