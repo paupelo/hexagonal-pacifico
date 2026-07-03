@@ -61,7 +61,7 @@ if (!ADMIN_PASSWORD) {
 const TOURNAMENT = {
   name: 'Pentagonal Panamá Pacífico',
   venue: 'Sport Park, Panamá Pacífico',
-  startDate: 'Domingo 5 de julio de 2026',
+  startDate: 'Domingo 12 de julio de 2026',
   fee: '350 USD',
   payment: {
     account: '04-72-00-733927-2',
@@ -94,18 +94,18 @@ const SCHEDULE = [
   {
     round: 1,
     label: 'Jornada 1',
-    date: 'Domingo 5 de julio de 2026',
+    date: 'Domingo 12 de julio de 2026',
     type: 'liga',
     rest: 'New Generation PPFC',
     matches: [
-      { id: 'j1-1', time: '8:15', home: 'Panamá Pacífico Residentes FC', away: 'Hermandad FC' },
-      { id: 'j1-2', time: '9:30', home: 'Cludsa FC', away: 'Deportivo Amarillo' },
+      { id: 'j1-1', time: '7:30', home: 'Panamá Pacífico Residentes FC', away: 'Hermandad FC' },
+      { id: 'j1-2', time: '9:00', home: 'Cludsa FC', away: 'Deportivo Amarillo' },
     ],
   },
   {
     round: 2,
     label: 'Jornada 2',
-    date: 'Domingo 12 de julio de 2026',
+    date: 'Domingo 19 de julio de 2026',
     type: 'liga',
     rest: 'Hermandad FC',
     matches: [
@@ -116,7 +116,7 @@ const SCHEDULE = [
   {
     round: 3,
     label: 'Jornada 3',
-    date: 'Domingo 19 de julio de 2026',
+    date: 'Domingo 26 de julio de 2026',
     type: 'liga',
     rest: 'Deportivo Amarillo',
     matches: [
@@ -127,7 +127,7 @@ const SCHEDULE = [
   {
     round: 4,
     label: 'Jornada 4',
-    date: 'Domingo 26 de julio de 2026',
+    date: 'Domingo 2 de agosto de 2026',
     type: 'liga',
     rest: 'Cludsa FC',
     matches: [
@@ -138,7 +138,7 @@ const SCHEDULE = [
   {
     round: 5,
     label: 'Jornada 5',
-    date: 'Domingo 2 de agosto de 2026',
+    date: 'Domingo 9 de agosto de 2026',
     type: 'liga',
     rest: 'Panamá Pacífico Residentes FC',
     matches: [
@@ -149,17 +149,17 @@ const SCHEDULE = [
   {
     round: 6,
     label: 'Semifinales',
-    date: 'Domingo 9 de agosto de 2026',
+    date: 'Domingo 16 de agosto de 2026',
     type: 'semifinal',
     matches: [
-      { id: 'sf-1', time: '7:00', home: '1º clasificado', away: '4º clasificado' },
-      { id: 'sf-2', time: '8:15', home: '2º clasificado', away: '3º clasificado' },
+      { id: 'sf-1', time: '7:30', home: '1º clasificado', away: '4º clasificado' },
+      { id: 'sf-2', time: '9:00', home: '2º clasificado', away: '3º clasificado' },
     ],
   },
   {
     round: 7,
     label: 'Final',
-    date: 'Domingo 16 de agosto de 2026',
+    date: 'Domingo 23 de agosto de 2026',
     type: 'final',
     matches: [
       { id: 'final', time: '8:00', home: 'Ganador Semifinal 1', away: 'Ganador Semifinal 2' },
