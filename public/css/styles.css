@@ -137,6 +137,13 @@ a { color: inherit; text-decoration: none; }
 }
 .team-card h3 { font-size: 17px; font-weight: 700; font-family: 'Inter'; letter-spacing: 0; }
 
+/* ---------- ESCUDOS (imagen dentro de contenedor circular uniforme) ---------- */
+.team-badge, .mini-badge, .team-cell .dot, .rest-badge { overflow: hidden; }
+.team-badge img, .mini-badge img, .team-cell .dot img, .rest-badge img {
+  width: 100%; height: 100%; object-fit: contain; border-radius: 50%;
+  background: #fff; display: block;
+}
+
 /* ---------- FORMATO ---------- */
 .format-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 .format-card {
@@ -184,6 +191,17 @@ a { color: inherit; text-decoration: none; }
   background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 4px 12px;
 }
 .match-score .sep { color: var(--accent); margin: 0 4px; }
+.round-rest {
+  display: flex; align-items: center; gap: 10px; margin-top: 14px;
+  color: var(--muted); font-size: 14px;
+}
+.round-rest strong { color: var(--text); font-weight: 700; }
+.rest-badge {
+  width: 28px; height: 28px; border-radius: 50%; flex: none;
+  background: var(--surface-2); border: 1.5px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Archivo'; font-weight: 900; font-size: 11px; color: var(--muted);
+}
 
 /* ---------- TABLAS ---------- */
 .table-scroll { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--line); }

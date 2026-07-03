@@ -59,7 +59,7 @@ if (!ADMIN_PASSWORD) {
 // DATOS FIJOS DEL TORNEO (no se guardan en la BD)
 // --------------------------------------------------------------------------
 const TOURNAMENT = {
-  name: 'Hexagonal Panamá Pacífico',
+  name: 'Pentagonal Panamá Pacífico',
   venue: 'Sport Park, Panamá Pacífico',
   startDate: 'Domingo 5 de julio de 2026',
   fee: '350 USD',
@@ -74,23 +74,32 @@ const TOURNAMENT = {
 const TEAMS = [
   'Panamá Pacífico Residentes FC',
   'Cludsa FC',
-  'Colegio Francés',
-  'Deportivo Amarillos',
+  'Deportivo Amarillo',
   'Hermandad FC',
   'New Generation PPFC',
 ];
 
+// Escudo de cada equipo (rutas dentro de public/).
+const TEAM_BADGES = {
+  'Panamá Pacífico Residentes FC': '/escudos/panama-pacifico.jpeg',
+  'Cludsa FC': '/escudos/cludsa.jpeg',
+  'Deportivo Amarillo': '/escudos/deportivo-amarillo.png',
+  'Hermandad FC': '/escudos/hermandad.jpeg',
+  'New Generation PPFC': '/escudos/new-generation.jpeg',
+};
+
 // El calendario es FIJO. En la BD solo se guardan los resultados (por match id).
+// Con 5 equipos hay 2 partidos por jornada y un equipo descansa (rest).
 const SCHEDULE = [
   {
     round: 1,
     label: 'Jornada 1',
     date: 'Domingo 5 de julio de 2026',
     type: 'liga',
+    rest: 'New Generation PPFC',
     matches: [
-      { id: 'j1-1', time: '7:00', home: 'Colegio Francés', away: 'New Generation PPFC' },
-      { id: 'j1-2', time: '8:15', home: 'Panamá Pacífico Residentes FC', away: 'Cludsa FC' },
-      { id: 'j1-3', time: '9:30', home: 'Deportivo Amarillos', away: 'Hermandad FC' },
+      { id: 'j1-1', time: '8:15', home: 'Panamá Pacífico Residentes FC', away: 'Hermandad FC' },
+      { id: 'j1-2', time: '9:30', home: 'Cludsa FC', away: 'Deportivo Amarillo' },
     ],
   },
   {
@@ -98,10 +107,10 @@ const SCHEDULE = [
     label: 'Jornada 2',
     date: 'Domingo 12 de julio de 2026',
     type: 'liga',
+    rest: 'Hermandad FC',
     matches: [
-      { id: 'j2-1', time: '7:00', home: 'Panamá Pacífico Residentes FC', away: 'Colegio Francés' },
-      { id: 'j2-2', time: '8:15', home: 'Hermandad FC', away: 'New Generation PPFC' },
-      { id: 'j2-3', time: '9:30', home: 'Cludsa FC', away: 'Deportivo Amarillos' },
+      { id: 'j2-1', time: '7:30', home: 'New Generation PPFC', away: 'Deportivo Amarillo' },
+      { id: 'j2-2', time: '9:00', home: 'Panamá Pacífico Residentes FC', away: 'Cludsa FC' },
     ],
   },
   {
@@ -109,10 +118,10 @@ const SCHEDULE = [
     label: 'Jornada 3',
     date: 'Domingo 19 de julio de 2026',
     type: 'liga',
+    rest: 'Deportivo Amarillo',
     matches: [
-      { id: 'j3-1', time: '7:00', home: 'Panamá Pacífico Residentes FC', away: 'Deportivo Amarillos' },
-      { id: 'j3-2', time: '8:15', home: 'Cludsa FC', away: 'New Generation PPFC' },
-      { id: 'j3-3', time: '9:30', home: 'Colegio Francés', away: 'Hermandad FC' },
+      { id: 'j3-1', time: '7:30', home: 'Hermandad FC', away: 'Cludsa FC' },
+      { id: 'j3-2', time: '9:00', home: 'New Generation PPFC', away: 'Panamá Pacífico Residentes FC' },
     ],
   },
   {
@@ -120,10 +129,10 @@ const SCHEDULE = [
     label: 'Jornada 4',
     date: 'Domingo 26 de julio de 2026',
     type: 'liga',
+    rest: 'Cludsa FC',
     matches: [
-      { id: 'j4-1', time: '7:00', home: 'Deportivo Amarillos', away: 'New Generation PPFC' },
-      { id: 'j4-2', time: '8:15', home: 'Panamá Pacífico Residentes FC', away: 'Hermandad FC' },
-      { id: 'j4-3', time: '9:30', home: 'Cludsa FC', away: 'Colegio Francés' },
+      { id: 'j4-1', time: '7:30', home: 'Deportivo Amarillo', away: 'Panamá Pacífico Residentes FC' },
+      { id: 'j4-2', time: '9:00', home: 'Hermandad FC', away: 'New Generation PPFC' },
     ],
   },
   {
@@ -131,10 +140,10 @@ const SCHEDULE = [
     label: 'Jornada 5',
     date: 'Domingo 2 de agosto de 2026',
     type: 'liga',
+    rest: 'Panamá Pacífico Residentes FC',
     matches: [
-      { id: 'j5-1', time: '7:00', home: 'Cludsa FC', away: 'Hermandad FC' },
-      { id: 'j5-2', time: '8:15', home: 'Colegio Francés', away: 'Deportivo Amarillos' },
-      { id: 'j5-3', time: '9:30', home: 'Panamá Pacífico Residentes FC', away: 'New Generation PPFC' },
+      { id: 'j5-1', time: '7:30', home: 'Cludsa FC', away: 'New Generation PPFC' },
+      { id: 'j5-2', time: '9:00', home: 'Deportivo Amarillo', away: 'Hermandad FC' },
     ],
   },
   {
@@ -458,6 +467,7 @@ app.get('/api/data', async (req, res) => {
     res.json({
       tournament: TOURNAMENT,
       teams: TEAMS,
+      badges: TEAM_BADGES,
       schedule: SCHEDULE,
       results,
       scorers,

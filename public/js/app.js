@@ -26,6 +26,15 @@ function escapeHtml(str) {
   );
 }
 
+// Contenido del escudo de un equipo: imagen si existe, iniciales si no
+// (p. ej. "1º clasificado" en semifinales y final).
+function badgeContent(team) {
+  const src = (DATA && DATA.badges && DATA.badges[team]) || null;
+  return src
+    ? `<img src="${escapeHtml(src)}" alt="Escudo de ${escapeHtml(team)}" loading="lazy" />`
+    : escapeHtml(initials(team));
+}
+
 // Sesión de admin: la contraseña se guarda solo en sessionStorage.
 function getToken() { return sessionStorage.getItem('hpp_admin') || ''; }
 function setToken(t) { sessionStorage.setItem('hpp_admin', t); }
@@ -81,7 +90,7 @@ function renderTeams() {
     .map(
       (t) => `
       <div class="team-card">
-        <div class="team-badge">${escapeHtml(initials(t))}</div>
+        <div class="team-badge">${badgeContent(t)}</div>
         <h3>${escapeHtml(t)}</h3>
       </div>`
     )
@@ -110,18 +119,24 @@ function renderSchedule() {
             </div>
             <div class="match-body">
               <div class="match-team">
-                <div class="mini-badge">${escapeHtml(initials(m.home))}</div>
+                <div class="mini-badge">${badgeContent(m.home)}</div>
                 <span class="name">${escapeHtml(m.home)}</span>
               </div>
               <div class="match-center">${center}</div>
               <div class="match-team">
-                <div class="mini-badge">${escapeHtml(initials(m.away))}</div>
+                <div class="mini-badge">${badgeContent(m.away)}</div>
                 <span class="name">${escapeHtml(m.away)}</span>
               </div>
             </div>
           </div>`;
         })
         .join('');
+      const rest = round.rest
+        ? `<div class="round-rest">
+            <span class="rest-badge">${badgeContent(round.rest)}</span>
+            <span>Descansa: <strong>${escapeHtml(round.rest)}</strong></span>
+          </div>`
+        : '';
       return `
         <div class="round-block">
           <div class="round-head">
@@ -129,6 +144,7 @@ function renderSchedule() {
             ${round.date ? `<span class="round-date">${escapeHtml(round.date)}</span>` : ''}
           </div>
           <div class="matches">${cards}</div>
+          ${rest}
         </div>`;
     })
     .join('');
@@ -149,7 +165,7 @@ function renderStandings() {
         <td class="col-pos">${r.pos}</td>
         <td class="col-team">
           <div class="team-cell">
-            <span class="dot">${escapeHtml(initials(r.team))}</span>
+            <span class="dot">${badgeContent(r.team)}</span>
             <span>${escapeHtml(r.team)}${sorteo}</span>
           </div>
         </td>
