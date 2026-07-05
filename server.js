@@ -83,7 +83,7 @@ const TEAMS = [
 const TEAM_BADGES = {
   'Panamá Pacífico Residentes FC': '/escudos/panama-pacifico.jpeg',
   'Cludsa FC': '/escudos/cludsa.jpeg',
-  'Deportivo Amarillo': '/escudos/deportivo-amarillo.png',
+  'Deportivo Amarillo': '/escudos/escudo-amarillo-fc.jpeg',
   'Hermandad FC': '/escudos/hermandad.jpeg',
   'New Generation PPFC': '/escudos/new-generation.jpeg',
 };
