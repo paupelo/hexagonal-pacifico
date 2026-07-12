@@ -100,6 +100,21 @@ function renderTeams() {
 // ---------------------------------------------------------------------------
 // CALENDARIO
 // ---------------------------------------------------------------------------
+// Goleadores de un equipo en un partido concreto (lista pequeña bajo el nombre).
+function matchScorers(team, matchId) {
+  const list = (DATA.scorers || []).filter(
+    (s) => s.match_id === matchId && s.team === team && s.goals > 0
+  );
+  if (!list.length) return '';
+  const items = list
+    .map(
+      (s) =>
+        `<li>⚽ ${escapeHtml(s.player)}${s.goals > 1 ? ` <span class="x-goals">×${s.goals}</span>` : ''}</li>`
+    )
+    .join('');
+  return `<ul class="match-scorers">${items}</ul>`;
+}
+
 function renderSchedule() {
   const results = resultMap();
   $('#scheduleWrap').innerHTML = DATA.schedule
@@ -121,20 +136,24 @@ function renderSchedule() {
               <div class="match-team">
                 <div class="mini-badge">${badgeContent(m.home)}</div>
                 <span class="name">${escapeHtml(m.home)}</span>
+                ${matchScorers(m.home, m.id)}
               </div>
               <div class="match-center">${center}</div>
               <div class="match-team">
                 <div class="mini-badge">${badgeContent(m.away)}</div>
                 <span class="name">${escapeHtml(m.away)}</span>
+                ${matchScorers(m.away, m.id)}
               </div>
             </div>
           </div>`;
         })
         .join('');
-      const rest = round.rest
+      const restTeams = round.rest ? [].concat(round.rest) : [];
+      const rest = restTeams.length
         ? `<div class="round-rest">
-            <span class="rest-badge">${badgeContent(round.rest)}</span>
-            <span>Descansa: <strong>${escapeHtml(round.rest)}</strong></span>
+            ${restTeams.map((t) => `<span class="rest-badge">${badgeContent(t)}</span>`).join('')}
+            <span>${restTeams.length > 1 ? 'Descansan' : 'Descansa'}:
+              <strong>${restTeams.map(escapeHtml).join(' y ')}</strong></span>
           </div>`
         : '';
       return `
@@ -179,7 +198,18 @@ function renderStandings() {
 
 function renderScorers() {
   const body = $('#scorersBody');
-  const scorers = (DATA.scorers || []).filter((s) => s.goals > 0);
+  // Los goles se registran por partido: el Pichichi agrega el total por jugador.
+  const totals = new Map();
+  for (const s of DATA.scorers || []) {
+    if (!(s.goals > 0)) continue;
+    const k = s.player + '|' + s.team;
+    const cur = totals.get(k) || { player: s.player, team: s.team, goals: 0 };
+    cur.goals += s.goals;
+    totals.set(k, cur);
+  }
+  const scorers = Array.from(totals.values()).sort(
+    (a, b) => b.goals - a.goals || a.player.localeCompare(b.player, 'es')
+  );
   if (!scorers.length) {
     body.innerHTML = `<tr class="empty-row"><td colspan="4">Aún no hay goleadores registrados.</td></tr>`;
     return;
@@ -209,6 +239,27 @@ function fillTeamSelects() {
   const options = DATA.teams.map((t) => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
   $('#scorerTeam').innerHTML = options;
   $('#cardTeam').innerHTML = options;
+  $('#scorerMatch').innerHTML = DATA.schedule
+    .flatMap((round) =>
+      round.matches.map(
+        (m) =>
+          `<option value="${escapeHtml(m.id)}">${escapeHtml(matchLabel(round, m))}</option>`
+      )
+    )
+    .join('');
+}
+
+// Etiqueta corta de un partido para selects y tablas de admin.
+function matchLabel(round, m) {
+  return `${round.label} · ${m.home} vs ${m.away}`;
+}
+
+function matchLabelById(matchId) {
+  for (const round of DATA.schedule) {
+    const m = round.matches.find((x) => x.id === matchId);
+    if (m) return matchLabel(round, m);
+  }
+  return matchId || '—';
 }
 
 function renderAdminData() {
@@ -254,7 +305,7 @@ function renderAdminScorers() {
   const body = $('#adminScorersBody');
   const scorers = DATA.scorers || [];
   if (!scorers.length) {
-    body.innerHTML = `<tr class="empty-row"><td colspan="4">Sin goleadores.</td></tr>`;
+    body.innerHTML = `<tr class="empty-row"><td colspan="5">Sin goleadores.</td></tr>`;
     return;
   }
   body.innerHTML = scorers
@@ -263,6 +314,7 @@ function renderAdminScorers() {
       <tr data-id="${s.id}">
         <td>${escapeHtml(s.player)}</td>
         <td>${escapeHtml(s.team)}</td>
+        <td>${s.match_id ? escapeHtml(matchLabelById(s.match_id)) : '—'}</td>
         <td class="center">${s.goals}</td>
         <td class="center"><button class="row-del" data-del-scorer="${s.id}">Eliminar</button></td>
       </tr>`
@@ -388,6 +440,7 @@ function initEvents() {
       await apiWrite('POST', '/api/scorers', {
         player: $('#scorerPlayer').value,
         team: $('#scorerTeam').value,
+        matchId: $('#scorerMatch').value,
         goals: parseInt($('#scorerGoals').value, 10),
       });
       $('#scorerPlayer').value = '';

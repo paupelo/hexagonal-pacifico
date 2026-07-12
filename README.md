@@ -1,6 +1,6 @@
-# 🏆 Pentagonal Panamá Pacífico
+# 🏆 Hexagonal Panamá Pacífico
 
-Aplicación web full-stack para gestionar el torneo de fútbol **Pentagonal Panamá Pacífico**
+Aplicación web full-stack para gestionar el torneo de fútbol **Hexagonal Panamá Pacífico**
 (Sport Park, Panamá Pacífico · 2026).
 
 - **Frontend** estático (HTML/CSS/JS) con estética deportiva tipo FIFA.
@@ -175,9 +175,10 @@ Todas las rutas de **escritura** requieren la cabecera `Authorization: <ADMIN_PA
 
 ## ⚙️ Datos del torneo
 
-- **Formato:** liguilla de una sola vuelta (5 equipos, 5 jornadas; cada jornada descansa un equipo). Clasifican los 4 primeros a semifinales (1º vs 4º · 2º vs 3º) y la final es a partido único.
-- **Partidos:** domingos en 2 turnos (jornada 1: 8:15 y 9:30 · jornadas 2 a 5: 7:30 y 9:00), a 2 tiempos de 30 minutos.
-- **Desempates:** 1) head-to-head · 2) diferencia de goles · 3) goles a favor · 4) fair play (menos rojas) · 5) sorteo.
+- **Formato:** liguilla de una sola vuelta (6 equipos, 6 jornadas, 15 partidos). Clasifican los 4 primeros a semifinales (1º vs 4º · 2º vs 3º) y la final es a partido único.
+- **Partidos:** domingos. Liguilla y semifinales a 2 tiempos de 30 minutos; la final a 2 tiempos de 35.
+- **Turnos:** días de 3 partidos: 7:00–8:00, 8:15–9:15 y 9:30–10:30 · días de 2 partidos y semifinales: 7:30–8:30 y 8:45–9:45 · final: 8:00–9:15.
+- **Desempates:** 1) head-to-head · 2) diferencia de goles · 3) goles a favor · 4) fair play (menos rojas) · 5) orden alfabético.
 - **Inscripción:** 350 USD · Cuenta `04-72-00-733927-2` · Banco General · Ahorros · A nombre de *Panama Pacífico FC*.
 
 ---

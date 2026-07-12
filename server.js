@@ -59,7 +59,7 @@ if (!ADMIN_PASSWORD) {
 // DATOS FIJOS DEL TORNEO (no se guardan en la BD)
 // --------------------------------------------------------------------------
 const TOURNAMENT = {
-  name: 'Pentagonal Panamá Pacífico',
+  name: 'Hexagonal Panamá Pacífico',
   venue: 'Sport Park, Panamá Pacífico',
   startDate: 'Domingo 12 de julio de 2026',
   fee: '350 USD',
@@ -77,6 +77,7 @@ const TEAMS = [
   'Deportivo Amarillo',
   'Hermandad FC',
   'New Generation PPFC',
+  'Futbirria Amigos',
 ];
 
 // Escudo de cada equipo (rutas dentro de public/).
@@ -86,17 +87,22 @@ const TEAM_BADGES = {
   'Deportivo Amarillo': '/escudos/escudo-amarillo-fc.jpeg',
   'Hermandad FC': '/escudos/hermandad.jpeg',
   'New Generation PPFC': '/escudos/new-generation.jpeg',
+  'Futbirria Amigos': '/escudos/futbirria-amigos.jpeg',
 };
 
 // El calendario es FIJO. En la BD solo se guardan los resultados (por match id).
-// Con 5 equipos hay 2 partidos por jornada y un equipo descansa (rest).
+// Liguilla a una vuelta entre 6 equipos: 15 partidos en 6 jornadas.
+// Jornadas de 3 partidos: juegan todos (turnos 7:00, 8:15 y 9:30).
+// Jornadas de 2 partidos: descansan dos equipos (turnos 7:30 y 8:45).
+// Los turnos están repartidos para que cada equipo juegue un número
+// equilibrado de partidos en cada horario a lo largo del torneo.
 const SCHEDULE = [
   {
     round: 1,
     label: 'Jornada 1',
     date: 'Domingo 12 de julio de 2026',
     type: 'liga',
-    rest: 'New Generation PPFC',
+    rest: ['New Generation PPFC', 'Futbirria Amigos'],
     matches: [
       { id: 'j1-1', time: '7:30', home: 'Panamá Pacífico Residentes FC', away: 'Hermandad FC' },
       { id: 'j1-2', time: '9:00', home: 'Cludsa FC', away: 'Deportivo Amarillo' },
@@ -107,10 +113,10 @@ const SCHEDULE = [
     label: 'Jornada 2',
     date: 'Domingo 19 de julio de 2026',
     type: 'liga',
-    rest: 'Hermandad FC',
     matches: [
-      { id: 'j2-1', time: '7:30', home: 'New Generation PPFC', away: 'Deportivo Amarillo' },
-      { id: 'j2-2', time: '9:00', home: 'Panamá Pacífico Residentes FC', away: 'Cludsa FC' },
+      { id: 'j2-1', time: '7:00', home: 'Panamá Pacífico Residentes FC', away: 'Cludsa FC' },
+      { id: 'j2-2', time: '8:15', home: 'Deportivo Amarillo', away: 'Hermandad FC' },
+      { id: 'j2-3', time: '9:30', home: 'New Generation PPFC', away: 'Futbirria Amigos' },
     ],
   },
   {
@@ -118,10 +124,10 @@ const SCHEDULE = [
     label: 'Jornada 3',
     date: 'Domingo 26 de julio de 2026',
     type: 'liga',
-    rest: 'Deportivo Amarillo',
+    rest: ['Deportivo Amarillo', 'Hermandad FC'],
     matches: [
-      { id: 'j3-1', time: '7:30', home: 'Hermandad FC', away: 'Cludsa FC' },
-      { id: 'j3-2', time: '9:00', home: 'New Generation PPFC', away: 'Panamá Pacífico Residentes FC' },
+      { id: 'j3-1', time: '7:30', home: 'Panamá Pacífico Residentes FC', away: 'New Generation PPFC' },
+      { id: 'j3-2', time: '8:45', home: 'Cludsa FC', away: 'Futbirria Amigos' },
     ],
   },
   {
@@ -129,10 +135,10 @@ const SCHEDULE = [
     label: 'Jornada 4',
     date: 'Domingo 2 de agosto de 2026',
     type: 'liga',
-    rest: 'Cludsa FC',
+    rest: ['Panamá Pacífico Residentes FC', 'Cludsa FC'],
     matches: [
-      { id: 'j4-1', time: '7:30', home: 'Deportivo Amarillo', away: 'Panamá Pacífico Residentes FC' },
-      { id: 'j4-2', time: '9:00', home: 'Hermandad FC', away: 'New Generation PPFC' },
+      { id: 'j4-1', time: '7:30', home: 'Deportivo Amarillo', away: 'Futbirria Amigos' },
+      { id: 'j4-2', time: '8:45', home: 'Hermandad FC', away: 'New Generation PPFC' },
     ],
   },
   {
@@ -140,26 +146,37 @@ const SCHEDULE = [
     label: 'Jornada 5',
     date: 'Domingo 9 de agosto de 2026',
     type: 'liga',
-    rest: 'Panamá Pacífico Residentes FC',
     matches: [
-      { id: 'j5-1', time: '7:30', home: 'Cludsa FC', away: 'New Generation PPFC' },
-      { id: 'j5-2', time: '9:00', home: 'Deportivo Amarillo', away: 'Hermandad FC' },
+      { id: 'j5-1', time: '7:00', home: 'Deportivo Amarillo', away: 'New Generation PPFC' },
+      { id: 'j5-2', time: '8:15', home: 'Panamá Pacífico Residentes FC', away: 'Futbirria Amigos' },
+      { id: 'j5-3', time: '9:30', home: 'Cludsa FC', away: 'Hermandad FC' },
     ],
   },
   {
     round: 6,
-    label: 'Semifinales',
+    label: 'Jornada 6',
     date: 'Domingo 16 de agosto de 2026',
-    type: 'semifinal',
+    type: 'liga',
     matches: [
-      { id: 'sf-1', time: '7:30', home: '1º clasificado', away: '4º clasificado' },
-      { id: 'sf-2', time: '9:00', home: '2º clasificado', away: '3º clasificado' },
+      { id: 'j6-1', time: '7:00', home: 'Hermandad FC', away: 'Futbirria Amigos' },
+      { id: 'j6-2', time: '8:15', home: 'Cludsa FC', away: 'New Generation PPFC' },
+      { id: 'j6-3', time: '9:30', home: 'Panamá Pacífico Residentes FC', away: 'Deportivo Amarillo' },
     ],
   },
   {
     round: 7,
-    label: 'Final',
+    label: 'Semifinales',
     date: 'Domingo 23 de agosto de 2026',
+    type: 'semifinal',
+    matches: [
+      { id: 'sf-1', time: '7:30', home: '1º clasificado', away: '4º clasificado' },
+      { id: 'sf-2', time: '8:45', home: '2º clasificado', away: '3º clasificado' },
+    ],
+  },
+  {
+    round: 8,
+    label: 'Final',
+    date: 'Domingo 30 de agosto de 2026',
     type: 'final',
     matches: [
       { id: 'final', time: '8:00', home: 'Ganador Semifinal 1', away: 'Ganador Semifinal 2' },
@@ -167,7 +184,26 @@ const SCHEDULE = [
   },
 ];
 
-// Solo los partidos de liga (jornadas 1-5) cuentan para la clasificación.
+// Resultados y goleadores oficiales ya conocidos (Jornada 1, 12 de julio).
+// Se siembran en la base de datos al arrancar si aún no existen, de modo que
+// la web muestre la clasificación y los goleadores sin intervención del admin.
+const SEED_RESULTS = [
+  { match_id: 'j1-1', home_goals: 2, away_goals: 2 }, // Panamá Pacífico 2-2 Hermandad
+  { match_id: 'j1-2', home_goals: 0, away_goals: 4 }, // Cludsa 0-4 Deportivo Amarillo
+];
+
+const SEED_SCORERS = [
+  { player: 'Julián Dueñas', team: 'Panamá Pacífico Residentes FC', goals: 1, match_id: 'j1-1' },
+  { player: 'Luis Stanziola', team: 'Panamá Pacífico Residentes FC', goals: 1, match_id: 'j1-1' },
+  { player: 'Londres López', team: 'Hermandad FC', goals: 1, match_id: 'j1-1' },
+  { player: 'Silvano Nicholson', team: 'Hermandad FC', goals: 1, match_id: 'j1-1' },
+  { player: 'Gerardo Jiménez', team: 'Deportivo Amarillo', goals: 1, match_id: 'j1-2' },
+  { player: 'José Pinnock', team: 'Deportivo Amarillo', goals: 1, match_id: 'j1-2' },
+  { player: 'Octavio Maravilla', team: 'Deportivo Amarillo', goals: 1, match_id: 'j1-2' },
+  { player: 'Ricardo Dubois', team: 'Deportivo Amarillo', goals: 1, match_id: 'j1-2' },
+];
+
+// Solo los partidos de liga (jornadas 1-6) cuentan para la clasificación.
 const LEAGUE_MATCHES = SCHEDULE.filter((r) => r.type === 'liga').flatMap((r) => r.matches);
 
 // --------------------------------------------------------------------------
@@ -193,12 +229,15 @@ function createPgStore() {
       `);
       await pool.query(`
         CREATE TABLE IF NOT EXISTS goleadores (
-          id     SERIAL PRIMARY KEY,
-          player TEXT NOT NULL,
-          team   TEXT NOT NULL,
-          goals  INTEGER NOT NULL DEFAULT 0
+          id       SERIAL PRIMARY KEY,
+          player   TEXT NOT NULL,
+          team     TEXT NOT NULL,
+          goals    INTEGER NOT NULL DEFAULT 0,
+          match_id TEXT
         );
       `);
+      // Migración para bases de datos creadas antes de asociar goles a partidos.
+      await pool.query('ALTER TABLE goleadores ADD COLUMN IF NOT EXISTS match_id TEXT;');
       await pool.query(`
         CREATE TABLE IF NOT EXISTS tarjetas (
           id     SERIAL PRIMARY KEY,
@@ -208,13 +247,35 @@ function createPgStore() {
         );
       `);
       console.log('[DB] Tablas verificadas/creadas correctamente (PostgreSQL).');
+
+      // Sembrar resultados oficiales que aún no estén cargados (no pisa
+      // nada que el admin haya guardado ya para ese partido).
+      for (const r of SEED_RESULTS) {
+        await pool.query(
+          `INSERT INTO resultados (match_id, home_goals, away_goals)
+           VALUES ($1, $2, $3)
+           ON CONFLICT (match_id) DO NOTHING`,
+          [r.match_id, r.home_goals, r.away_goals]
+        );
+      }
+      // Sembrar goleadores solo si la tabla está vacía (evita duplicados).
+      const { rows } = await pool.query('SELECT COUNT(*)::int AS n FROM goleadores');
+      if (rows[0].n === 0) {
+        for (const s of SEED_SCORERS) {
+          await pool.query(
+            'INSERT INTO goleadores (player, team, goals, match_id) VALUES ($1, $2, $3, $4)',
+            [s.player, s.team, s.goals, s.match_id]
+          );
+        }
+        console.log('[DB] Goleadores de la Jornada 1 sembrados.');
+      }
     },
     async getResults() {
       return (await pool.query('SELECT match_id, home_goals, away_goals FROM resultados')).rows;
     },
     async getScorers() {
       return (await pool.query(
-        'SELECT id, player, team, goals FROM goleadores ORDER BY goals DESC, player ASC'
+        'SELECT id, player, team, goals, match_id FROM goleadores ORDER BY goals DESC, player ASC'
       )).rows;
     },
     async getCards() {
@@ -232,17 +293,18 @@ function createPgStore() {
     async deleteResult(matchId) {
       await pool.query('DELETE FROM resultados WHERE match_id = $1', [matchId]);
     },
-    async addScorer(player, team, goals) {
+    async addScorer(player, team, goals, matchId) {
       const { rows } = await pool.query(
-        'INSERT INTO goleadores (player, team, goals) VALUES ($1, $2, $3) RETURNING id',
-        [player, team, goals]
+        'INSERT INTO goleadores (player, team, goals, match_id) VALUES ($1, $2, $3, $4) RETURNING id',
+        [player, team, goals, matchId]
       );
       return rows[0].id;
     },
-    async updateScorer(id, player, team, goals) {
-      await pool.query('UPDATE goleadores SET player = $1, team = $2, goals = $3 WHERE id = $4', [
-        player, team, goals, id,
-      ]);
+    async updateScorer(id, player, team, goals, matchId) {
+      await pool.query(
+        'UPDATE goleadores SET player = $1, team = $2, goals = $3, match_id = $4 WHERE id = $5',
+        [player, team, goals, matchId, id]
+      );
     },
     async deleteScorer(id) {
       await pool.query('DELETE FROM goleadores WHERE id = $1', [id]);
@@ -268,7 +330,9 @@ function createMemoryStore() {
   const sameId = (a, b) => String(a) === String(b);
   return {
     async init() {
-      console.log('[DB] Almacén en memoria listo (modo preview).');
+      results = SEED_RESULTS.map((r) => ({ ...r }));
+      scorers = SEED_SCORERS.map((s) => ({ id: seq++, ...s }));
+      console.log('[DB] Almacén en memoria listo (modo preview, con datos de la Jornada 1).');
     },
     async getResults() {
       return results.map((r) => ({ ...r }));
@@ -293,14 +357,14 @@ function createMemoryStore() {
     async deleteResult(matchId) {
       results = results.filter((r) => r.match_id !== matchId);
     },
-    async addScorer(player, team, goals) {
+    async addScorer(player, team, goals, matchId) {
       const id = seq++;
-      scorers.push({ id, player, team, goals });
+      scorers.push({ id, player, team, goals, match_id: matchId });
       return id;
     },
-    async updateScorer(id, player, team, goals) {
+    async updateScorer(id, player, team, goals, matchId) {
       const s = scorers.find((x) => sameId(x.id, id));
-      if (s) Object.assign(s, { player, team, goals });
+      if (s) Object.assign(s, { player, team, goals, match_id: matchId });
     },
     async deleteScorer(id) {
       scorers = scorers.filter((x) => !sameId(x.id, id));
@@ -502,12 +566,16 @@ app.delete('/api/results/:matchId', requireAdmin, async (req, res) => {
 // --- Escritura: añadir goleador ---
 app.post('/api/scorers', requireAdmin, async (req, res) => {
   try {
-    const { player, team, goals } = req.body || {};
+    const { player, team, goals, matchId } = req.body || {};
     const g = Number(goals);
     if (!player || !team || !TEAMS.includes(team) || !Number.isInteger(g) || g < 0) {
       return res.status(400).json({ error: 'Datos de goleador inválidos' });
     }
-    const id = await store.addScorer(String(player).trim(), team, g);
+    const validIds = SCHEDULE.flatMap((r) => r.matches.map((m) => m.id));
+    if (matchId && !validIds.includes(matchId)) {
+      return res.status(400).json({ error: 'matchId inválido' });
+    }
+    const id = await store.addScorer(String(player).trim(), team, g, matchId || null);
     res.json({ ok: true, id });
   } catch (err) {
     console.error('Error añadiendo goleador:', err);
@@ -518,12 +586,16 @@ app.post('/api/scorers', requireAdmin, async (req, res) => {
 // --- Escritura: actualizar goleador ---
 app.put('/api/scorers/:id', requireAdmin, async (req, res) => {
   try {
-    const { player, team, goals } = req.body || {};
+    const { player, team, goals, matchId } = req.body || {};
     const g = Number(goals);
     if (!player || !team || !TEAMS.includes(team) || !Number.isInteger(g) || g < 0) {
       return res.status(400).json({ error: 'Datos de goleador inválidos' });
     }
-    await store.updateScorer(req.params.id, String(player).trim(), team, g);
+    const validIds = SCHEDULE.flatMap((r) => r.matches.map((m) => m.id));
+    if (matchId && !validIds.includes(matchId)) {
+      return res.status(400).json({ error: 'matchId inválido' });
+    }
+    await store.updateScorer(req.params.id, String(player).trim(), team, g, matchId || null);
     res.json({ ok: true });
   } catch (err) {
     console.error('Error actualizando goleador:', err);
