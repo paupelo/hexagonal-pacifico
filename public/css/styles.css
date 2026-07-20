@@ -223,6 +223,9 @@ a { color: inherit; text-decoration: none; }
 .table-scroll { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--line); }
 table { width: 100%; border-collapse: collapse; background: var(--surface); min-width: 560px; }
 .scorers, .admin-table { min-width: 480px; }
+/* Nombre y equipo del goleador siempre en una sola línea (la tabla ya
+   tiene scroll horizontal propio en .table-scroll). */
+.scorers td { white-space: nowrap; }
 th, td { padding: 13px 12px; text-align: center; font-size: 14px; border-bottom: 1px solid var(--line); }
 thead th {
   background: var(--surface-2); color: var(--muted); text-transform: uppercase;

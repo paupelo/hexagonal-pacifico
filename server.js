@@ -184,12 +184,15 @@ const SCHEDULE = [
   },
 ];
 
-// Resultados y goleadores oficiales ya conocidos (Jornada 1, 12 de julio).
+// Resultados y goleadores oficiales ya conocidos (Jornadas 1 y 2).
 // Se siembran en la base de datos al arrancar si aún no existen, de modo que
 // la web muestre la clasificación y los goleadores sin intervención del admin.
 const SEED_RESULTS = [
   { match_id: 'j1-1', home_goals: 2, away_goals: 2 }, // Panamá Pacífico 2-2 Hermandad
   { match_id: 'j1-2', home_goals: 0, away_goals: 4 }, // Cludsa 0-4 Deportivo Amarillo
+  { match_id: 'j2-1', home_goals: 0, away_goals: 3 }, // Panamá Pacífico 0-3 Cludsa
+  { match_id: 'j2-2', home_goals: 0, away_goals: 3 }, // Deportivo Amarillo 0-3 Hermandad
+  { match_id: 'j2-3', home_goals: 4, away_goals: 1 }, // New Generation 4-1 Futbirria Amigos
 ];
 
 const SEED_SCORERS = [
@@ -201,6 +204,15 @@ const SEED_SCORERS = [
   { player: 'José Pinnock', team: 'Deportivo Amarillo', goals: 1, match_id: 'j1-2' },
   { player: 'Octavio Maravilla', team: 'Deportivo Amarillo', goals: 1, match_id: 'j1-2' },
   { player: 'Ricardo Dubois', team: 'Deportivo Amarillo', goals: 1, match_id: 'j1-2' },
+  { player: 'Rubén Córdoba', team: 'Cludsa FC', goals: 1, match_id: 'j2-1' },
+  { player: 'Iansen Carrillo', team: 'Cludsa FC', goals: 1, match_id: 'j2-1' },
+  { player: 'Julio Joyce', team: 'Cludsa FC', goals: 1, match_id: 'j2-1' },
+  { player: 'Silvano Nicholson', team: 'Hermandad FC', goals: 2, match_id: 'j2-2' },
+  { player: 'Federico Cotter', team: 'Hermandad FC', goals: 1, match_id: 'j2-2' },
+  { player: 'Luis Rodríguez', team: 'New Generation PPFC', goals: 2, match_id: 'j2-3' },
+  { player: 'Ricaurte Cárdenas', team: 'New Generation PPFC', goals: 1, match_id: 'j2-3' },
+  { player: 'Alex Delgado', team: 'New Generation PPFC', goals: 1, match_id: 'j2-3' },
+  { player: 'Héctor Carrillo', team: 'Futbirria Amigos', goals: 1, match_id: 'j2-3' },
 ];
 
 // Solo los partidos de liga (jornadas 1-6) cuentan para la clasificación.
@@ -258,16 +270,23 @@ function createPgStore() {
           [r.match_id, r.home_goals, r.away_goals]
         );
       }
-      // Sembrar goleadores solo si la tabla está vacía (evita duplicados).
-      const { rows } = await pool.query('SELECT COUNT(*)::int AS n FROM goleadores');
-      if (rows[0].n === 0) {
-        for (const s of SEED_SCORERS) {
+      // Sembrar goleadores por partido: los de un partido solo se insertan si
+      // ese partido aún no tiene ninguno registrado (evita duplicados y no
+      // pisa lo que el admin haya cargado a mano para ese partido).
+      const seedMatchIds = [...new Set(SEED_SCORERS.map((s) => s.match_id))];
+      for (const matchId of seedMatchIds) {
+        const { rows } = await pool.query(
+          'SELECT COUNT(*)::int AS n FROM goleadores WHERE match_id = $1',
+          [matchId]
+        );
+        if (rows[0].n > 0) continue;
+        for (const s of SEED_SCORERS.filter((x) => x.match_id === matchId)) {
           await pool.query(
             'INSERT INTO goleadores (player, team, goals, match_id) VALUES ($1, $2, $3, $4)',
             [s.player, s.team, s.goals, s.match_id]
           );
         }
-        console.log('[DB] Goleadores de la Jornada 1 sembrados.');
+        console.log(`[DB] Goleadores sembrados para el partido ${matchId}.`);
       }
     },
     async getResults() {
