@@ -193,6 +193,8 @@ const SEED_RESULTS = [
   { match_id: 'j2-1', home_goals: 0, away_goals: 3 }, // Panamá Pacífico 0-3 Cludsa
   { match_id: 'j2-2', home_goals: 0, away_goals: 3 }, // Deportivo Amarillo 0-3 Hermandad
   { match_id: 'j2-3', home_goals: 4, away_goals: 1 }, // New Generation 4-1 Futbirria Amigos
+  { match_id: 'j3-1', home_goals: 2, away_goals: 1 }, // Panamá Pacífico 2-1 New Generation
+  { match_id: 'j3-2', home_goals: 0, away_goals: 4 }, // Cludsa 0-4 Futbirria Amigos (goleadores pendientes)
 ];
 
 const SEED_SCORERS = [
@@ -213,6 +215,10 @@ const SEED_SCORERS = [
   { player: 'Ricaurte Cárdenas', team: 'New Generation PPFC', goals: 1, match_id: 'j2-3' },
   { player: 'Alex Delgado', team: 'New Generation PPFC', goals: 1, match_id: 'j2-3' },
   { player: 'Héctor Carrillo', team: 'Futbirria Amigos', goals: 1, match_id: 'j2-3' },
+  { player: 'Paulo Ramos', team: 'Panamá Pacífico Residentes FC', goals: 1, match_id: 'j3-1' },
+  { player: 'Luis Stanziola', team: 'Panamá Pacífico Residentes FC', goals: 1, match_id: 'j3-1' },
+  { player: 'Luis Rodríguez', team: 'New Generation PPFC', goals: 1, match_id: 'j3-1' },
+  // Futbirria Amigos 4-0 Cludsa (j3-2): 4 goles sin goleador identificado (pendientes).
 ];
 
 // Solo los partidos de liga (jornadas 1-6) cuentan para la clasificación.
