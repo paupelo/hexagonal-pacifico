@@ -221,6 +221,13 @@ const SEED_SCORERS = [
   // Futbirria Amigos 4-0 Cludsa (j3-2): 4 goles sin goleador identificado (pendientes).
 ];
 
+// Tarjetas oficiales conocidas. Se siembran de forma idempotente al arrancar.
+// La roja cuenta para el criterio de fair play en la clasificación.
+const SEED_CARDS = [
+  // Roja por doble amarilla a un jugador de Hermandad en Panamá Pacífico 2-2 Hermandad (j1-1).
+  { player: 'Jugador Hermandad (doble amarilla)', team: 'Hermandad FC', type: 'roja' },
+];
+
 // Solo los partidos de liga (jornadas 1-6) cuentan para la clasificación.
 const LEAGUE_MATCHES = SCHEDULE.filter((r) => r.type === 'liga').flatMap((r) => r.matches);
 
@@ -294,6 +301,20 @@ function createPgStore() {
         }
         console.log(`[DB] Goleadores sembrados para el partido ${matchId}.`);
       }
+      // Sembrar tarjetas conocidas solo si esa misma tarjeta (jugador+equipo+tipo)
+      // aún no existe, para no duplicarla en reinicios ni pisar lo del admin.
+      for (const c of SEED_CARDS) {
+        const { rows } = await pool.query(
+          'SELECT COUNT(*)::int AS n FROM tarjetas WHERE player = $1 AND team = $2 AND type = $3',
+          [c.player, c.team, c.type]
+        );
+        if (rows[0].n > 0) continue;
+        await pool.query(
+          'INSERT INTO tarjetas (player, team, type) VALUES ($1, $2, $3)',
+          [c.player, c.team, c.type]
+        );
+        console.log(`[DB] Tarjeta sembrada: ${c.type} para ${c.player} (${c.team}).`);
+      }
     },
     async getResults() {
       return (await pool.query('SELECT match_id, home_goals, away_goals FROM resultados')).rows;
@@ -357,6 +378,7 @@ function createMemoryStore() {
     async init() {
       results = SEED_RESULTS.map((r) => ({ ...r }));
       scorers = SEED_SCORERS.map((s) => ({ id: seq++, ...s }));
+      cards = SEED_CARDS.map((c) => ({ id: seq++, ...c }));
       console.log('[DB] Almacén en memoria listo (modo preview, con datos de la Jornada 1).');
     },
     async getResults() {
