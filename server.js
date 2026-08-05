@@ -195,6 +195,8 @@ const SEED_RESULTS = [
   { match_id: 'j2-3', home_goals: 4, away_goals: 1 }, // New Generation 4-1 Futbirria Amigos
   { match_id: 'j3-1', home_goals: 2, away_goals: 1 }, // Panamá Pacífico 2-1 New Generation
   { match_id: 'j3-2', home_goals: 0, away_goals: 4 }, // Cludsa 0-4 Futbirria Amigos (goleadores pendientes)
+  { match_id: 'j4-1', home_goals: 3, away_goals: 1 }, // Deportivo Amarillo 3-1 Futbirria Amigos
+  { match_id: 'j4-2', home_goals: 1, away_goals: 0 }, // Hermandad 1-0 New Generation
 ];
 
 const SEED_SCORERS = [
@@ -219,6 +221,10 @@ const SEED_SCORERS = [
   { player: 'Luis Stanziola', team: 'Panamá Pacífico Residentes FC', goals: 1, match_id: 'j3-1' },
   { player: 'Luis Rodríguez', team: 'New Generation PPFC', goals: 1, match_id: 'j3-1' },
   // Futbirria Amigos 4-0 Cludsa (j3-2): 4 goles sin goleador identificado (pendientes).
+  { player: 'Jonathan Botacio', team: 'Deportivo Amarillo', goals: 2, match_id: 'j4-1' },
+  { player: 'Robinson Zarco', team: 'Deportivo Amarillo', goals: 1, match_id: 'j4-1' },
+  // Deportivo Amarillo 3-1 Futbirria (j4-1): el gol de Futbirria queda sin goleador identificado (pendiente).
+  { player: 'Silvano Nicholson', team: 'Hermandad FC', goals: 1, match_id: 'j4-2' },
 ];
 
 // Tarjetas oficiales conocidas. Se siembran de forma idempotente al arrancar.
