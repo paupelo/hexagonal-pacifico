@@ -184,7 +184,7 @@ const SCHEDULE = [
   },
 ];
 
-// Resultados y goleadores oficiales ya conocidos (Jornadas 1 y 2).
+// Resultados y goleadores oficiales ya conocidos (Jornadas 1 a 5).
 // Se siembran en la base de datos al arrancar si aún no existen, de modo que
 // la web muestre la clasificación y los goleadores sin intervención del admin.
 const SEED_RESULTS = [
@@ -197,6 +197,10 @@ const SEED_RESULTS = [
   { match_id: 'j3-2', home_goals: 0, away_goals: 4 }, // Cludsa 0-4 Futbirria Amigos (goleadores pendientes)
   { match_id: 'j4-1', home_goals: 3, away_goals: 1 }, // Deportivo Amarillo 3-1 Futbirria Amigos
   { match_id: 'j4-2', home_goals: 1, away_goals: 0 }, // Hermandad 1-0 New Generation
+  // Jornada 5 (9/8/2026)
+  { match_id: 'j5-1', home_goals: 3, away_goals: 0 }, // Deportivo Amarillo 3-0 New Generation
+  { match_id: 'j5-2', home_goals: 2, away_goals: 2 }, // Panamá Pacífico 2-2 Futbirria Amigos
+  { match_id: 'j5-3', home_goals: 1, away_goals: 5 }, // Cludsa 1-5 Hermandad
 ];
 
 const SEED_SCORERS = [
@@ -225,6 +229,13 @@ const SEED_SCORERS = [
   { player: 'Robinson Zarco', team: 'Deportivo Amarillo', goals: 1, match_id: 'j4-1' },
   // Deportivo Amarillo 3-1 Futbirria (j4-1): el gol de Futbirria queda sin goleador identificado (pendiente).
   { player: 'Silvano Nicholson', team: 'Hermandad FC', goals: 1, match_id: 'j4-2' },
+  { player: 'Dinnick Salerno', team: 'Deportivo Amarillo', goals: 1, match_id: 'j5-1' },
+  { player: 'Jonathan Botacio', team: 'Deportivo Amarillo', goals: 1, match_id: 'j5-1' },
+  // Deportivo Amarillo 3-0 New Generation (j5-1): el otro gol fue en propia meta (no cuenta para la tabla de goleadores).
+  { player: 'Rodrigo Grattulini', team: 'Panamá Pacífico Residentes FC', goals: 1, match_id: 'j5-2' },
+  { player: 'Julián Dueñas', team: 'Panamá Pacífico Residentes FC', goals: 1, match_id: 'j5-2' },
+  // Panamá Pacífico 2-2 Futbirria (j5-2): los 2 goles de Futbirria quedan sin goleador identificado (pendientes).
+  // Cludsa 1-5 Hermandad (j5-3): los 6 goles quedan sin goleador identificado (pendientes).
 ];
 
 // Tarjetas oficiales conocidas. Se siembran de forma idempotente al arrancar.
