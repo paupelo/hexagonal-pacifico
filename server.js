@@ -169,8 +169,8 @@ const SCHEDULE = [
     date: 'Domingo 23 de agosto de 2026',
     type: 'semifinal',
     matches: [
-      { id: 'sf-1', time: '7:30', home: '1º clasificado', away: '4º clasificado' },
-      { id: 'sf-2', time: '8:45', home: '2º clasificado', away: '3º clasificado' },
+      { id: 'sf-1', time: '7:30', home: 'Hermandad FC', away: 'Panamá Pacífico Residentes FC' },
+      { id: 'sf-2', time: '8:45', home: 'Deportivo Amarillo', away: 'Cludsa FC' },
     ],
   },
   {
@@ -184,7 +184,7 @@ const SCHEDULE = [
   },
 ];
 
-// Resultados y goleadores oficiales ya conocidos (Jornadas 1 a 5).
+// Resultados y goleadores oficiales ya conocidos (Jornadas 1 a 6).
 // Se siembran en la base de datos al arrancar si aún no existen, de modo que
 // la web muestre la clasificación y los goleadores sin intervención del admin.
 const SEED_RESULTS = [
@@ -201,6 +201,10 @@ const SEED_RESULTS = [
   { match_id: 'j5-1', home_goals: 3, away_goals: 0 }, // Deportivo Amarillo 3-0 New Generation
   { match_id: 'j5-2', home_goals: 2, away_goals: 2 }, // Panamá Pacífico 2-2 Futbirria Amigos
   { match_id: 'j5-3', home_goals: 1, away_goals: 5 }, // Cludsa 1-5 Hermandad
+  // Jornada 6 (16/8/2026)
+  { match_id: 'j6-1', home_goals: 2, away_goals: 0 }, // Hermandad 2-0 Futbirria Amigos
+  { match_id: 'j6-2', home_goals: 3, away_goals: 1 }, // Cludsa 3-1 New Generation
+  { match_id: 'j6-3', home_goals: 1, away_goals: 3 }, // Panamá Pacífico 1-3 Deportivo Amarillo
 ];
 
 const SEED_SCORERS = [
@@ -236,6 +240,12 @@ const SEED_SCORERS = [
   { player: 'Julián Dueñas', team: 'Panamá Pacífico Residentes FC', goals: 1, match_id: 'j5-2' },
   // Panamá Pacífico 2-2 Futbirria (j5-2): los 2 goles de Futbirria quedan sin goleador identificado (pendientes).
   // Cludsa 1-5 Hermandad (j5-3): los 6 goles quedan sin goleador identificado (pendientes).
+  { player: 'Nicolás Muñoz', team: 'Hermandad FC', goals: 1, match_id: 'j6-1' },
+  { player: 'José Alcázar', team: 'Hermandad FC', goals: 1, match_id: 'j6-1' },
+  // Cludsa 3-1 New Generation (j6-2): los 4 goles quedan sin goleador identificado (pendientes).
+  { player: 'Ricardo Dubois', team: 'Deportivo Amarillo', goals: 2, match_id: 'j6-3' },
+  { player: 'Jonathan Botacio', team: 'Deportivo Amarillo', goals: 1, match_id: 'j6-3' },
+  { player: 'Jorge Geo', team: 'Panamá Pacífico Residentes FC', goals: 1, match_id: 'j6-3' },
 ];
 
 // Tarjetas oficiales conocidas. Se siembran de forma idempotente al arrancar.
