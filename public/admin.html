@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin · Hexagonal Panamá Pacífico</title>
+  <meta name="robots" content="noindex" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner">
+      <a href="/" class="brand">
+        <span class="brand-mark">HPP</span>
+        <span class="brand-text">Panel de administración</span>
+      </a>
+      <nav>
+        <a href="/">← Volver a la web</a>
+        <a href="#" id="logoutBtn" hidden>Cerrar sesión</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Login -->
+  <div id="adminLogin" class="gate">
+    <div class="gate-card">
+      <h2>Acceso de administración</h2>
+      <p>Solo se puede editar la edición activa del torneo.</p>
+      <form id="loginForm">
+        <input type="password" id="adminPassword" class="input" placeholder="Contraseña de admin" autocomplete="current-password" required />
+        <button type="submit" class="btn btn-primary">Entrar</button>
+        <span id="loginMsg" class="form-msg"></span>
+      </form>
+    </div>
+  </div>
+
+  <!-- Panel -->
+  <main id="adminPanel" hidden style="padding-top:24px">
+    <p class="admin-note" id="edicionActual" style="margin-bottom:14px"></p>
+
+    <div class="admin-tabs">
+      <button class="atab active" data-tab="resultados">Resultados</button>
+      <button class="atab" data-tab="goleadores">Goleadores</button>
+      <button class="atab" data-tab="equipos">Equipos</button>
+      <button class="atab" data-tab="ediciones">Ediciones</button>
+    </div>
+
+    <!-- RESULTADOS -->
+    <section class="atab-panel" id="tab-resultados">
+      <div class="admin-card">
+        <h3>Resultados de la edición activa</h3>
+        <p class="admin-note">En semifinales y final, si el partido acaba en empate rellena también los penaltis.</p>
+        <div id="adminResults"></div>
+      </div>
+    </section>
+
+    <!-- GOLEADORES -->
+    <section class="atab-panel" id="tab-goleadores" hidden>
+      <div class="admin-card">
+        <h3>Añadir goleador</h3>
+        <form id="scorerForm" class="admin-form">
+          <div class="row">
+            <input type="text" id="scorerPlayer" class="input" placeholder="Nombre del jugador" required />
+            <select id="scorerTeam" class="input"></select>
+          </div>
+          <div class="row">
+            <select id="scorerMatch" class="input"></select>
+            <input type="number" id="scorerGoals" class="input" min="1" value="1" required />
+          </div>
+          <div class="row">
+            <button type="submit" class="btn btn-primary btn-sm">Añadir</button>
+          </div>
+          <span id="scorerMsg" class="form-msg"></span>
+        </form>
+      </div>
+      <div class="admin-card">
+        <h3>Goleadores registrados</h3>
+        <div class="table-wrap">
+          <table class="admin-table">
+            <thead><tr><th class="col-left">Jugador</th><th class="col-left">Equipo</th><th class="col-left">Partido</th><th>Goles</th><th></th></tr></thead>
+            <tbody id="adminScorersBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- EQUIPOS -->
+    <section class="atab-panel" id="tab-equipos" hidden>
+      <div class="admin-card">
+        <h3>Equipos de la edición activa</h3>
+        <p class="admin-note">Puedes cambiar el nombre, la ruta del escudo (p. ej. <code>/escudos/mi-equipo.png</code>) o subir una imagen nueva.</p>
+        <div id="adminTeams"></div>
+      </div>
+    </section>
+
+    <!-- EDICIONES -->
+    <section class="atab-panel" id="tab-ediciones" hidden>
+      <div class="admin-card">
+        <h3>Ediciones</h3>
+        <div class="table-wrap">
+          <table class="admin-table">
+            <thead><tr><th class="col-left">Edición</th><th class="col-left">Slug</th><th>Estado</th><th></th></tr></thead>
+            <tbody id="adminEditionsBody"></tbody>
+          </table>
+        </div>
+        <p class="admin-note">Archivar una edición congela su clasificación final y la deja en modo solo lectura en /archivo. Activar una edición la convierte en la portada de la web.</p>
+      </div>
+
+      <div class="admin-card">
+        <h3>Crear nueva edición</h3>
+        <form id="editionForm" class="admin-form">
+          <div class="row">
+            <input type="text" id="edNombre" class="input" placeholder="Nombre (p. ej. Hexagonal Panamá Pacífico – Marzo-Abril 2027)" required />
+          </div>
+          <div class="row">
+            <input type="text" id="edNombreCorto" class="input" placeholder="Nombre corto (p. ej. Marzo-Abril 2027)" />
+            <input type="text" id="edSlug" class="input" placeholder="slug (p. ej. 2027-mar-abr)" pattern="[a-z0-9-]+" required />
+          </div>
+          <div class="row">
+            <input type="date" id="edInicio" class="input" />
+            <input type="date" id="edFin" class="input" />
+          </div>
+          <div class="row"><button type="submit" class="btn btn-primary btn-sm">Crear edición</button></div>
+          <span id="editionMsg" class="form-msg"></span>
+        </form>
+      </div>
+
+      <div class="admin-card">
+        <h3>Montar una edición (equipos, jornadas y partidos)</h3>
+        <form class="admin-form">
+          <div class="row">
+            <select id="builderEdition" class="input"></select>
+          </div>
+        </form>
+        <div id="builderDetail" class="admin-note" style="margin-bottom:12px"></div>
+
+        <form id="builderTeamForm" class="admin-form" style="margin-bottom:16px">
+          <div class="row">
+            <input type="text" id="btNombre" class="input" placeholder="Nombre del equipo" required />
+            <input type="text" id="btLogo" class="input" placeholder="Ruta del escudo (opcional)" />
+            <button type="submit" class="btn btn-ghost btn-sm">Añadir equipo</button>
+          </div>
+        </form>
+
+        <form id="builderRoundForm" class="admin-form" style="margin-bottom:16px">
+          <div class="row">
+            <input type="number" id="bjOrden" class="input" placeholder="Orden" min="1" required />
+            <input type="text" id="bjLabel" class="input" placeholder="Nombre (Jornada 1…)" required />
+            <select id="bjTipo" class="input">
+              <option value="liga">Liga</option>
+              <option value="semifinal">Semifinal</option>
+              <option value="final">Final</option>
+              <option value="descanso">Descanso</option>
+            </select>
+          </div>
+          <div class="row">
+            <input type="text" id="bjFecha" class="input" placeholder="Fecha (texto: Domingo 4 de…)" />
+            <input type="text" id="bjNota" class="input" placeholder="Nota (opcional)" />
+            <button type="submit" class="btn btn-ghost btn-sm">Añadir jornada</button>
+          </div>
+        </form>
+
+        <form id="builderMatchForm" class="admin-form">
+          <div class="row">
+            <select id="bpJornada" class="input"></select>
+            <input type="text" id="bpKey" class="input" placeholder="Id (j1-1…)" pattern="[a-z0-9-]+" required />
+            <input type="text" id="bpHora" class="input" placeholder="Hora (7:00)" />
+          </div>
+          <div class="row">
+            <select id="bpHome" class="input"></select>
+            <select id="bpAway" class="input"></select>
+            <button type="submit" class="btn btn-ghost btn-sm">Añadir partido</button>
+          </div>
+          <p class="admin-note">Para cruces sin equipo aún (1º clasificado, Ganador Semifinal 1…), elige “— placeholder —” y escribe la etiqueta cuando se te pida.</p>
+        </form>
+        <span id="builderMsg" class="form-msg"></span>
+      </div>
+    </section>
+  </main>
+
+  <script src="/js/admin.js"></script>
+</body>
+</html>

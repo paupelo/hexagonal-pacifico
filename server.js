@@ -588,6 +588,24 @@ async function edicionEditable(req, res) {
   return edicion;
 }
 
+// Detalle de cualquier edición (para montar futuras ediciones desde el panel).
+app.get('/api/admin/ediciones/:id/detalle', requireAdmin, async (req, res) => {
+  try {
+    const ediciones = await store.getEdiciones();
+    const edicion = ediciones.find((e) => String(e.id) === String(req.params.id));
+    if (!edicion) return res.status(404).json({ error: 'Edición no encontrada' });
+    const [equipos, jornadas, partidos] = await Promise.all([
+      store.getEquipos(edicion.id),
+      store.getJornadas(edicion.id),
+      store.getPartidos(edicion.id),
+    ]);
+    res.json({ edicion, equipos, jornadas, partidos });
+  } catch (err) {
+    console.error('Error en detalle de edición:', err);
+    res.status(500).json({ error: 'Error al obtener la edición' });
+  }
+});
+
 app.post('/api/admin/ediciones/:id/equipos', requireAdmin, async (req, res) => {
   try {
     const edicion = await edicionEditable(req, res);
