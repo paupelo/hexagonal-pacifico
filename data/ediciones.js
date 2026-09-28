@@ -52,8 +52,8 @@ const EDICIONES = [
       {
         orden: 1, label: 'Jornada 1', fecha: 'Domingo 4 de octubre de 2026', tipo: 'liga',
         partidos: [
-          { key: 'j1-1', hora: '7:00', home: 'Panamá Pacífico Residentes', away: 'La10 West FC' },
-          { key: 'j1-2', hora: '8:15', home: 'Deportivo Amarillo', away: 'New Generation' },
+          { key: 'j1-2', hora: '7:00', home: 'Deportivo Amarillo', away: 'New Generation' },
+          { key: 'j1-1', hora: '8:15', home: 'Panamá Pacífico Residentes', away: 'La10 West FC' },
           { key: 'j1-3', hora: '9:30', home: 'Baviera FC', away: 'Cludsa FC' },
         ],
       },
