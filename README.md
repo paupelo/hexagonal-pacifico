@@ -1,16 +1,20 @@
 # 🏆 Hexagonal Panamá Pacífico
 
 Aplicación web full-stack para gestionar el torneo de fútbol **Hexagonal Panamá Pacífico**
-(Sport Park, Panamá Pacífico · 2026).
+(Sport Park, Panamá Pacífico). Soporta **varias ediciones**: la web pública muestra la
+edición activa y las ediciones anteriores quedan archivadas en `/archivo`, protegidas
+por contraseña y en modo solo lectura.
 
-- **Frontend** estático (HTML/CSS/JS) con estética deportiva tipo FIFA.
+- **Frontend** estático (HTML/CSS/JS) con estética limpia y mobile first.
 - **Backend** Node.js + Express: un único Web Service sirve el frontend y expone la API REST.
-- **Base de datos** PostgreSQL (librería `pg`): se guardan resultados, goleadores y tarjetas.
-- El **calendario es fijo** (está en el código). En la base de datos solo se guardan resultados, goleadores y tarjetas.
-- La **clasificación** se calcula automáticamente en el servidor, con los criterios de desempate del reglamento.
-- **Panel de administración** protegido por contraseña validada en el servidor.
-
-> Los datos se comparten entre todos los dispositivos porque se guardan en PostgreSQL (no en el navegador).
+- **Base de datos** PostgreSQL (librería `pg`) con modelo multi-edición:
+  `ediciones`, `equipos`, `jornadas`, `partidos`, `goleadores`, `tarjetas` y `logos`.
+- La **clasificación** se calcula en el servidor. Criterios de desempate (en este orden):
+  puntos · diferencia de goles · goles a favor · enfrentamiento directo · orden alfabético.
+  Las ediciones archivadas conservan su clasificación final **congelada** tal y como quedó.
+- Los **cruces de semifinales y final** se rellenan solos cuando hay datos (liga completa /
+  semifinal decidida); los empates en eliminatorias se resuelven con **penaltis**.
+- **Panel de administración** en `/admin`: solo permite editar la edición activa.
 
 ---
 
@@ -18,98 +22,90 @@ Aplicación web full-stack para gestionar el torneo de fútbol **Hexagonal Panam
 
 ```
 hexagonal-pacifico/
-├── server.js          # Servidor Express + API + conexión a PostgreSQL
-├── package.json       # Dependencias y scripts
-├── .env.example       # Plantilla de variables de entorno
-├── .gitignore
-├── README.md
-└── public/            # Frontend estático
-    ├── index.html
+├── server.js                  # Servidor Express + API
+├── lib/
+│   ├── db.js                  # Capa de datos (PostgreSQL + modo preview en memoria)
+│   └── clasificacion.js       # Cálculo de la clasificación (criterios v1 y v2)
+├── data/ediciones.js          # Única fuente de verdad de las ediciones sembradas
+├── migrations/                # Migraciones SQL idempotentes (se aplican al arrancar)
+├── scripts/
+│   ├── backup.sh              # Backup con pg_dump a backups/ (ignorado por git)
+│   ├── migrate.js             # Aplica las migraciones a mano (p. ej. producción)
+│   └── generate-migration.js  # Regenera la migración desde data/ediciones.js
+└── public/                    # Frontend estático
+    ├── index.html             # Vista del torneo (edición activa y archivadas)
+    ├── archivo.html           # Listado de ediciones archivadas
+    ├── admin.html             # Panel de administración
     ├── css/styles.css
-    └── js/app.js
+    ├── js/                    # app.js · archivo.js · admin.js
+    └── escudos/               # Escudos de los equipos
 ```
 
 ---
 
-## 🚀 Despliegue en Render.com (guía para principiantes)
+## 🔑 Variables de entorno
 
-Sigue estos pasos en orden. No necesitas saber programar.
+| Variable           | Obligatoria | Descripción                                                                 |
+| ------------------ | :---------: | --------------------------------------------------------------------------- |
+| `DATABASE_URL`     | En producción | URL de PostgreSQL. Sin ella la app usa un almacén **en memoria** (solo local). |
+| `ADMIN_PASSWORD`   | Sí          | Contraseña del panel `/admin` (edición activa).                              |
+| `ARCHIVE_PASSWORD` | Sí          | Contraseña (distinta de la de admin) para consultar las ediciones archivadas en `/archivo`. |
 
-### Paso 1 — Subir el proyecto a GitHub
-
-1. Crea una cuenta en [github.com](https://github.com) si no tienes.
-2. Crea un **repositorio nuevo** (botón **New**). Ponle un nombre, por ejemplo `hexagonal-pacifico`. Déjalo **vacío** (sin README).
-3. Abre una terminal dentro de la carpeta del proyecto y ejecuta:
-
-   ```bash
-   git init
-   git add .
-   git commit -m "Primera versión del torneo"
-   git branch -M main
-   git remote add origin https://github.com/TU_USUARIO/hexagonal-pacifico.git
-   git push -u origin main
-   ```
-
-   (Sustituye `TU_USUARIO` por tu usuario de GitHub.)
-
-### Paso 2 — Crear la base de datos PostgreSQL en Render
-
-1. Crea una cuenta en [render.com](https://render.com) (puedes entrar con tu cuenta de GitHub).
-2. En el panel, pulsa **New +** → **PostgreSQL**.
-3. Ponle un nombre (por ejemplo `hexagonal-db`), elige la región más cercana y el plan **Free**.
-4. Pulsa **Create Database** y espera a que el estado sea **Available**.
-5. En la página de la base de datos, busca el apartado **Connections** y copia la **Internal Database URL**
-   (empieza por `postgres://...`). La necesitarás en el Paso 4.
-
-### Paso 3 — Crear el Web Service conectado al repo
-
-1. Pulsa **New +** → **Web Service**.
-2. Conecta tu cuenta de GitHub y selecciona el repositorio `hexagonal-pacifico`.
-3. Configura:
-   - **Runtime / Language:** Node
-   - **Build Command:** `npm install`
-   - **Start Command:** `npm start`
-   - **Plan:** Free
-4. **No** pulses crear todavía: primero añade las variables de entorno (Paso 4).
-
-### Paso 4 — Configurar las variables de entorno
-
-En la sección **Environment Variables** del Web Service, añade estas dos:
-
-| Key              | Value                                                              |
-| ---------------- | ------------------------------------------------------------------ |
-| `DATABASE_URL`   | Pega la **Internal Database URL** que copiaste en el Paso 2.       |
-| `ADMIN_PASSWORD` | La contraseña secreta que tú elijas para entrar al panel de Admin. |
-
-> 💡 Si tu Web Service y tu base de datos están en la misma cuenta de Render, también puedes
-> usar **Add from Database** para que `DATABASE_URL` se enlace automáticamente.
-
-### Paso 5 — Desplegar
-
-1. Pulsa **Create Web Service**. Render instalará dependencias y arrancará la app.
-2. Al arrancar, el servidor **crea las tablas automáticamente** (no tienes que hacer nada en la BD).
-3. Cuando el estado sea **Live**, abre la URL pública que te da Render (algo como
-   `https://hexagonal-pacifico.onrender.com`). ¡Listo!
-
-### Actualizar la app más adelante
-
-Cada vez que hagas `git push` a la rama `main`, Render volverá a desplegar automáticamente.
+En el modo preview local (sin `DATABASE_URL`) las contraseñas por defecto son
+`admin` y `archivo`.
 
 ---
 
-## 🔐 Uso del panel de administración
+## 🗄️ Migraciones y backups
 
-1. En la web, ve a la pestaña **Admin**.
-2. Introduce la `ADMIN_PASSWORD` que configuraste en Render.
-3. Desde ahí puedes:
-   - **Resultados:** cargar/editar el marcador de cada partido.
-   - **Goleadores:** registrar jugador, equipo y goles (alimenta la tabla de máximos goleadores).
-   - **Tarjetas:** registrar amarillas y rojas (las rojas alimentan el criterio de fair play).
+- Las migraciones viven en `migrations/*.sql`, son **idempotentes** y **no destructivas**
+  (las tablas legadas `resultados`, `goleadores` y `tarjetas` se conservan; sus datos se
+  copian al modelo multi-edición). El servidor las aplica automáticamente al arrancar.
+- Para migrar a mano (por ejemplo producción, antes de desplegar el código nuevo):
 
-La clasificación, los marcadores del calendario y la tabla de goleadores se actualizan al instante.
+  ```bash
+  DATABASE_URL='postgres://…' node scripts/migrate.js
+  ```
 
-> La contraseña nunca está en el código: el servidor la lee de `ADMIN_PASSWORD` y valida cada
-> petición de escritura. Las rutas de lectura son públicas.
+- **Antes de migrar producción, haz siempre un backup**:
+
+  ```bash
+  DATABASE_URL='postgres://…' ./scripts/backup.sh
+  ```
+
+  La URL **externa** está en el dashboard de Render → `hexagonal-pacifico-db` →
+  **External Database URL**. El backup se guarda en `backups/` (ignorado por git).
+  Para restaurar: `pg_restore --clean --if-exists -d "$DATABASE_URL" backups/<archivo>.dump`.
+
+---
+
+## 🆕 Crear una nueva edición (sin tocar código)
+
+1. Entra en `/admin` → pestaña **Ediciones**.
+2. **Crear nueva edición** con nombre, nombre corto, slug (p. ej. `2027-mar-abr`) y fechas.
+3. En **Montar una edición**, selecciona la edición recién creada y añade sus equipos
+   (con la ruta de su escudo), sus jornadas (liga / semifinal / final / descanso) y sus
+   partidos. Para cruces sin equipo todavía usa etiquetas como `1º clasificado` o
+   `Ganador Semifinal 1`: la web los rellena sola cuando haya datos.
+4. Cuando termine la edición actual: **Archivar** (congela su clasificación final y la
+   deja en `/archivo`) y **Activar** la nueva para que sea la portada.
+
+## 🛡️ Añadir o cambiar escudos
+
+- Sube el archivo a `public/escudos/` y usa la ruta `/escudos/<archivo>` en el campo
+  *logo* del equipo (pestaña **Equipos** del admin), **o** sube la imagen directamente
+  desde esa pestaña (se guarda en la base de datos y se sirve en `/api/logos/:id`).
+- Si un equipo no tiene escudo, la web muestra un círculo con sus iniciales
+  (nunca una imagen rota).
+
+---
+
+## 🚀 Despliegue en Render
+
+El proyecto ya está desplegado como Web Service + PostgreSQL (ver `render.yaml`).
+Cada `git push` a `main` redespliega automáticamente. Recuerda añadir
+`ARCHIVE_PASSWORD` en **Environment** del Web Service (además de `ADMIN_PASSWORD`
+y `DATABASE_URL`, que ya existen).
 
 ---
 
@@ -117,70 +113,53 @@ La clasificación, los marcadores del calendario y la tabla de goleadores se act
 
 Solo necesitas **Node.js 20**.
 
-### Opción A — Previsualización rápida (sin base de datos)
-
-Si **no** defines `DATABASE_URL`, la app usa un almacén **en memoria** para que puedas ver
-toda la web funcionando al instante. Los datos no se guardan al reiniciar (es solo para mirar).
-
 ```bash
 npm install
-npm start
+npm start          # o npm run dev (recarga automática)
 ```
 
-Abre [http://localhost:3000](http://localhost:3000). Para entrar al panel **Admin** en este modo,
-la contraseña por defecto es `admin` (o la que pongas en `ADMIN_PASSWORD`).
+- Sin `DATABASE_URL`: modo preview en memoria con las dos ediciones sembradas
+  (contraseñas `admin` y `archivo`).
+- Con `DATABASE_URL` (copia `.env.example` a `.env` si existe): PostgreSQL real;
+  las migraciones se aplican solas al arrancar.
 
-> Este modo en memoria se activa solo en local; en Render, al haber `DATABASE_URL`, siempre se usa PostgreSQL real.
-
-### Opción B — Con PostgreSQL real en local
-
-1. Copia el archivo de ejemplo y edítalo:
-
-   ```bash
-   cp .env.example .env
-   ```
-
-   Ajusta `DATABASE_URL` a tu PostgreSQL local y pon una `ADMIN_PASSWORD`.
-
-2. Instala dependencias y arranca:
-
-   ```bash
-   npm install
-   npm run dev        # recarga automática (Node 20)
-   # o bien:
-   npm start
-   ```
-
-3. Abre [http://localhost:3000](http://localhost:3000).
+Abre [http://localhost:3000](http://localhost:3000).
 
 ---
 
 ## 🧩 Resumen de la API
 
-Todas las rutas de **escritura** requieren la cabecera `Authorization: <ADMIN_PASSWORD>`.
+Rutas públicas:
 
-| Método   | Ruta                   | Auth | Descripción                          |
-| -------- | ---------------------- | :--: | ------------------------------------ |
-| `POST`   | `/api/login`           |  No  | Valida la contraseña de admin.       |
-| `GET`    | `/api/data`            |  No  | Devuelve calendario, resultados, clasificación, goleadores y tarjetas. |
-| `POST`   | `/api/results`         |  Sí  | Guarda/actualiza el marcador de un partido. |
-| `DELETE` | `/api/results/:matchId`|  Sí  | Borra el resultado de un partido.    |
-| `POST`   | `/api/scorers`         |  Sí  | Añade un goleador.                   |
-| `PUT`    | `/api/scorers/:id`     |  Sí  | Edita un goleador.                   |
-| `DELETE` | `/api/scorers/:id`     |  Sí  | Elimina un goleador.                 |
-| `POST`   | `/api/cards`           |  Sí  | Registra una tarjeta.                |
-| `DELETE` | `/api/cards/:id`       |  Sí  | Elimina una tarjeta.                 |
+| Método | Ruta                        | Descripción                                          |
+| ------ | --------------------------- | ---------------------------------------------------- |
+| `GET`  | `/api/data`                 | Datos completos de la edición activa.                |
+| `GET`  | `/api/archivo/ediciones`    | Listado de ediciones archivadas.                     |
+| `POST` | `/api/archivo/login`        | Valida `ARCHIVE_PASSWORD` y crea la cookie de sesión.|
+| `GET`  | `/api/archivo/:slug/data`   | Datos de una edición archivada (requiere cookie).    |
+| `GET`  | `/api/logos/:id`            | Sirve un escudo subido desde el admin.               |
+| `POST` | `/api/login`                | Valida la contraseña de admin.                       |
+
+Rutas de administración (cabecera `Authorization: <ADMIN_PASSWORD>`; solo actúan
+sobre la edición **activa**, salvo la gestión de ediciones):
+
+| Método   | Ruta                                  | Descripción                                    |
+| -------- | ------------------------------------- | ---------------------------------------------- |
+| `GET`    | `/api/admin/data`                     | Datos de administración de la edición activa.  |
+| `POST`   | `/api/admin/resultados`               | Guarda un marcador (con penaltis en eliminatorias). |
+| `DELETE` | `/api/admin/resultados/:partidoId`    | Borra un marcador.                             |
+| `POST`   | `/api/admin/goleadores`               | Añade un goleador.                             |
+| `DELETE` | `/api/admin/goleadores/:id`           | Elimina un goleador.                           |
+| `PUT`    | `/api/admin/equipos/:id`              | Edita nombre y logo de un equipo.              |
+| `POST`   | `/api/admin/equipos/:id/logo`         | Sube el escudo de un equipo (base64).          |
+| `POST`   | `/api/admin/ediciones`                | Crea una edición nueva.                        |
+| `GET`    | `/api/admin/ediciones/:id/detalle`    | Equipos/jornadas/partidos de una edición.      |
+| `POST`   | `/api/admin/ediciones/:id/activar`    | Convierte la edición en la portada.            |
+| `POST`   | `/api/admin/ediciones/:id/archivar`   | Archiva y congela su clasificación final.      |
+| `POST`   | `/api/admin/ediciones/:id/equipos`    | Añade un equipo a una edición no archivada.    |
+| `POST`   | `/api/admin/ediciones/:id/jornadas`   | Añade una jornada.                             |
+| `POST`   | `/api/admin/ediciones/:id/partidos`   | Añade un partido.                              |
 
 ---
 
-## ⚙️ Datos del torneo
-
-- **Formato:** liguilla de una sola vuelta (6 equipos, 6 jornadas, 15 partidos). Clasifican los 4 primeros a semifinales (1º vs 4º · 2º vs 3º) y la final es a partido único.
-- **Partidos:** domingos. Liguilla y semifinales a 2 tiempos de 30 minutos; la final a 2 tiempos de 35.
-- **Turnos:** días de 3 partidos: 7:00–8:00, 8:15–9:15 y 9:30–10:30 · días de 2 partidos y semifinales: 7:30–8:30 y 8:45–9:45 · final: 8:00–9:15.
-- **Desempates:** 1) head-to-head · 2) diferencia de goles · 3) goles a favor · 4) fair play (menos rojas) · 5) orden alfabético.
-- **Inscripción:** 350 USD · Cuenta `04-72-00-733927-2` · Banco General · Ahorros · A nombre de *Panama Pacífico FC*.
-
----
-
-Sport Park · Panamá Pacífico · 2026
+Sport Park · Panamá Pacífico
