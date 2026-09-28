@@ -96,7 +96,7 @@ async function buildEdicionPayload(edicion) {
 
   // Clasificación: cálculo con los criterios vigentes; si la edición tiene la
   // posición final congelada (ediciones archivadas), ese orden manda.
-  let clasificacion = computeStandings(equipos, liga, { criterios: 'v2' });
+  let clasificacion = computeStandings(equipos, liga);
   const congelada = equipos.length > 0 && equipos.every((e) => e.posicion_final);
   if (congelada) {
     const posByEquipo = new Map(equipos.map((e) => [e.id, e.posicion_final]));
@@ -562,7 +562,7 @@ app.post('/api/admin/ediciones/:id/archivar', requireAdmin, async (req, res) => 
     const equipos = await store.getEquipos(edicion.id);
     const partidos = await store.getPartidos(edicion.id);
     const liga = partidos.filter((p) => p.jornada_tipo === 'liga');
-    const standings = computeStandings(equipos, liga, { criterios: 'v2' });
+    const standings = computeStandings(equipos, liga);
     await store.setPosicionesFinales(standings.map((r) => ({ equipoId: r.equipo_id, pos: r.pos })));
     await store.archivarEdicion(edicion.id);
     res.json({ ok: true });

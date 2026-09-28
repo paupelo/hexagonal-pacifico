@@ -1,9 +1,10 @@
 # 🏆 Hexagonal Panamá Pacífico
 
 Aplicación web full-stack para gestionar el torneo de fútbol **Hexagonal Panamá Pacífico**
-(Sport Park, Panamá Pacífico). Soporta **varias ediciones**: la web pública muestra la
-edición activa y las ediciones anteriores quedan archivadas en `/archivo`, protegidas
-por contraseña y en modo solo lectura.
+(Sport Park, Panamá Pacífico). La edición vigente es **Octubre-Noviembre 2026**. La app
+soporta **varias ediciones**: la web pública muestra la edición activa y, cuando una
+edición se archive desde el admin, quedará en `/archivo`, protegida por contraseña y en
+modo solo lectura.
 
 - **Frontend** estático (HTML/CSS/JS) con estética limpia y mobile first.
 - **Backend** Node.js + Express: un único Web Service sirve el frontend y expone la API REST.
@@ -58,9 +59,10 @@ En el modo preview local (sin `DATABASE_URL`) las contraseñas por defecto son
 
 ## 🗄️ Migraciones y backups
 
-- Las migraciones viven en `migrations/*.sql`, son **idempotentes** y **no destructivas**
-  (las tablas legadas `resultados`, `goleadores` y `tarjetas` se conservan; sus datos se
-  copian al modelo multi-edición). El servidor las aplica automáticamente al arrancar.
+- Las migraciones viven en `migrations/*.sql`, son **idempotentes** y el servidor las
+  aplica automáticamente al arrancar. La migración `2026-09-28-purge-primera-edicion.sql`
+  elimina a propósito los datos de la primera edición del torneo (Julio-Agosto 2026):
+  el proyecto arranca de cero con la edición Octubre-Noviembre 2026.
 - Para migrar a mano (por ejemplo producción, antes de desplegar el código nuevo):
 
   ```bash

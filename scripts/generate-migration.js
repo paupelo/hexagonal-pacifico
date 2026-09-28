@@ -7,47 +7,22 @@
 
 const fs = require('fs');
 const path = require('path');
-const { EDICIONES, LEGACY_RESULTS, LEGACY_SCORERS, LEGACY_CARDS, SLUG_ARCHIVADA } = require('../data/ediciones');
+const { EDICIONES } = require('../data/ediciones');
 
 const q = (s) => (s === null || s === undefined ? 'NULL' : `'${String(s).replace(/'/g, "''")}'`);
-const n = (v) => (v === null || v === undefined ? 'NULL' : Number(v));
 
 const out = [];
-out.push(`-- Migración multi-edición del Hexagonal Panamá Pacífico.
+out.push(`-- Migración del modelo multi-edición del Hexagonal Panamá Pacífico.
 -- Generada por scripts/generate-migration.js a partir de data/ediciones.js.
--- IDEMPOTENTE y NO DESTRUCTIVA: no borra ni renombra nada; las tablas legadas
--- (resultados, goleadores, tarjetas) se conservan y sus datos se COPIAN al
--- nuevo modelo. Puede ejecutarse varias veces sin efectos secundarios.
+-- IDEMPOTENTE: puede ejecutarse varias veces sin duplicar nada.
+--
+-- Nota: si la base de datos tiene las tablas de la primera edición del
+-- torneo (resultados, goleadores con esquema antiguo, tarjetas), esas tablas
+-- y sus filas se limpian con scripts/purge-primera-edicion.js; esta migración
+-- no las usa ni las toca (solo amplía goleadores con las columnas nuevas).
 
 BEGIN;
 
--- ---------------------------------------------------------------------------
--- 1. Tablas legadas (por si la base de datos es nueva y no existen aún).
--- ---------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS resultados (
-  match_id   TEXT PRIMARY KEY,
-  home_goals INTEGER NOT NULL,
-  away_goals INTEGER NOT NULL,
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-CREATE TABLE IF NOT EXISTS goleadores (
-  id       SERIAL PRIMARY KEY,
-  player   TEXT NOT NULL,
-  team     TEXT NOT NULL,
-  goals    INTEGER NOT NULL DEFAULT 0,
-  match_id TEXT
-);
-ALTER TABLE goleadores ADD COLUMN IF NOT EXISTS match_id TEXT;
-CREATE TABLE IF NOT EXISTS tarjetas (
-  id     SERIAL PRIMARY KEY,
-  player TEXT NOT NULL,
-  team   TEXT NOT NULL,
-  type   TEXT NOT NULL CHECK (type IN ('amarilla', 'roja'))
-);
-
--- ---------------------------------------------------------------------------
--- 2. Nuevo modelo multi-edición.
--- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS ediciones (
   id           SERIAL PRIMARY KEY,
   nombre       TEXT NOT NULL,
@@ -97,55 +72,27 @@ CREATE TABLE IF NOT EXISTS partidos (
   UNIQUE (edicion_id, match_key)
 );
 
+-- Goleadores: en una base nueva se crea directamente con el esquema actual;
+-- si la tabla ya existía (esquema de la primera edición del torneo), los
+-- ALTER de debajo le añaden las columnas que faltan.
+CREATE TABLE IF NOT EXISTS goleadores (
+  id     SERIAL PRIMARY KEY,
+  player TEXT NOT NULL,
+  team   TEXT,
+  goals  INTEGER NOT NULL DEFAULT 0
+);
+ALTER TABLE goleadores ADD COLUMN IF NOT EXISTS edicion_id INTEGER REFERENCES ediciones(id);
+ALTER TABLE goleadores ADD COLUMN IF NOT EXISTS partido_id INTEGER REFERENCES partidos(id);
+ALTER TABLE goleadores ADD COLUMN IF NOT EXISTS equipo_id  INTEGER REFERENCES equipos(id);
+
 -- Escudos subidos desde el panel de admin (se sirven en /api/logos/:id).
 CREATE TABLE IF NOT EXISTS logos (
   id   SERIAL PRIMARY KEY,
   mime TEXT NOT NULL,
   data TEXT NOT NULL
 );
-
--- edicion_id en TODAS las tablas de datos (las legadas incluidas).
-ALTER TABLE goleadores ADD COLUMN IF NOT EXISTS edicion_id INTEGER REFERENCES ediciones(id);
-ALTER TABLE goleadores ADD COLUMN IF NOT EXISTS partido_id INTEGER REFERENCES partidos(id);
-ALTER TABLE goleadores ADD COLUMN IF NOT EXISTS equipo_id  INTEGER REFERENCES equipos(id);
-ALTER TABLE tarjetas   ADD COLUMN IF NOT EXISTS edicion_id INTEGER REFERENCES ediciones(id);
-ALTER TABLE tarjetas   ADD COLUMN IF NOT EXISTS equipo_id  INTEGER REFERENCES equipos(id);
-ALTER TABLE resultados ADD COLUMN IF NOT EXISTS edicion_id INTEGER REFERENCES ediciones(id);
 `);
 
-// ---------------------------------------------------------------------------
-// 3. Seeds legados de la primera edición (solo insertan lo que falte).
-// ---------------------------------------------------------------------------
-out.push('-- ---------------------------------------------------------------------------');
-out.push('-- 3. Seeds legados de la primera edición (idempotentes, no pisan al admin).');
-out.push('-- ---------------------------------------------------------------------------');
-for (const r of LEGACY_RESULTS) {
-  out.push(
-    `INSERT INTO resultados (match_id, home_goals, away_goals) VALUES (${q(r.match_id)}, ${n(r.home_goals)}, ${n(r.away_goals)}) ON CONFLICT (match_id) DO NOTHING;`
-  );
-}
-const legacyMatches = [...new Set(LEGACY_SCORERS.map((s) => s.match_id))];
-for (const matchId of legacyMatches) {
-  const rows = LEGACY_SCORERS.filter((s) => s.match_id === matchId)
-    .map((s) => `(${q(s.player)}, ${q(s.team)}, ${n(s.goals)}, ${q(s.match_id)})`)
-    .join(',\n         ');
-  out.push(`INSERT INTO goleadores (player, team, goals, match_id)
-  SELECT * FROM (VALUES ${rows}) AS v(player, team, goals, match_id)
-  WHERE NOT EXISTS (SELECT 1 FROM goleadores WHERE match_id = ${q(matchId)});`);
-}
-for (const c of LEGACY_CARDS) {
-  out.push(`INSERT INTO tarjetas (player, team, type)
-  SELECT ${q(c.player)}, ${q(c.team)}, ${q(c.type)}
-  WHERE NOT EXISTS (SELECT 1 FROM tarjetas WHERE player = ${q(c.player)} AND team = ${q(c.team)} AND type = ${q(c.type)});`);
-}
-
-// ---------------------------------------------------------------------------
-// 4. Ediciones, equipos, jornadas y partidos.
-// ---------------------------------------------------------------------------
-out.push('');
-out.push('-- ---------------------------------------------------------------------------');
-out.push('-- 4. Ediciones, equipos, jornadas y partidos.');
-out.push('-- ---------------------------------------------------------------------------');
 for (const ed of EDICIONES) {
   const eid = `(SELECT id FROM ediciones WHERE slug = ${q(ed.slug)})`;
   out.push(`
@@ -174,36 +121,7 @@ INSERT INTO ediciones (nombre, nombre_corto, slug, fecha_inicio, fecha_fin, acti
   }
 }
 
-// ---------------------------------------------------------------------------
-// 5. Copia de los datos legados hacia la edición archivada.
-// ---------------------------------------------------------------------------
-const OLD = `(SELECT id FROM ediciones WHERE slug = ${q(SLUG_ARCHIVADA)})`;
-out.push(`
--- ---------------------------------------------------------------------------
--- 5. Asignar TODOS los registros legados a la edición ${SLUG_ARCHIVADA}
---    y copiar los marcadores a partidos. Solo toca filas aún sin asignar.
--- ---------------------------------------------------------------------------
-UPDATE resultados SET edicion_id = ${OLD} WHERE edicion_id IS NULL;
-
-UPDATE partidos p SET home_goals = r.home_goals, away_goals = r.away_goals
-  FROM resultados r
-  WHERE p.edicion_id = ${OLD}
-    AND r.match_id = p.match_key
-    AND p.home_goals IS NULL AND p.away_goals IS NULL;
-
-UPDATE goleadores g SET
-    edicion_id = ${OLD},
-    partido_id = (SELECT p.id FROM partidos p WHERE p.edicion_id = ${OLD} AND p.match_key = g.match_id),
-    equipo_id  = (SELECT e.id FROM equipos  e WHERE e.edicion_id = ${OLD} AND e.nombre   = g.team)
-  WHERE g.edicion_id IS NULL;
-
-UPDATE tarjetas t SET
-    edicion_id = ${OLD},
-    equipo_id  = (SELECT e.id FROM equipos e WHERE e.edicion_id = ${OLD} AND e.nombre = t.team)
-  WHERE t.edicion_id IS NULL;
-
-COMMIT;
-`);
+out.push('\nCOMMIT;');
 
 const dest = path.join(__dirname, '..', 'migrations', '2026-09-28-multi-edicion.sql');
 fs.mkdirSync(path.dirname(dest), { recursive: true });
