@@ -2,3 +2,6 @@ node_modules/
 .env
 *.log
 .DS_Store
+
+# Backups de la base de datos (pg_dump); nunca se suben al repo.
+backups/
