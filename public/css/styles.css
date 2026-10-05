@@ -321,8 +321,16 @@ tr.qualify .pos-cell { color: var(--accent); }
   margin-top: 4px;
   font-size: 0.68rem;
   color: var(--muted-2);
+  max-width: 100%;
+  min-width: 0;
 }
-.match-scorers li { line-height: 1.5; }
+/* Cada goleador ocupa exactamente una línea; si no cabe, elipsis. */
+.match-scorers li {
+  line-height: 1.5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .rest-card {
   background: #fff;
   border: 1px dashed var(--line-2);
@@ -341,8 +349,20 @@ tr.qualify .pos-cell { color: var(--accent); }
 }
 
 /* ── Goleadores ─────────────────────────────────────────────────────────── */
-.scorer-team { display: flex; align-items: center; gap: 8px; font-weight: 500; color: var(--muted-2); }
+/* Tabla sin scroll interno: columnas fijas y elipsis en nombres largos,
+   para que cada goleador ocupe siempre una sola línea. */
+.scorers-table { table-layout: fixed; }
+.scorers-table th:first-child { width: 34px; }
+.scorers-table th:last-child { width: 58px; }
+.scorers-table td { overflow: hidden; text-overflow: ellipsis; }
+.scorer-team { display: flex; align-items: center; gap: 8px; font-weight: 500; color: var(--muted-2); min-width: 0; }
+.scorer-team span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .goals-cell { font-weight: 900; color: var(--accent); font-size: 0.95rem; }
+@media (max-width: 480px) {
+  .scorers-table td, .scorers-table th { padding-left: 6px; padding-right: 6px; font-size: 0.8rem; }
+  .scorers-table .goals-cell { font-size: 0.9rem; }
+  .scorer-team { gap: 6px; }
+}
 
 /* ── Formato ────────────────────────────────────────────────────────────── */
 .format-grid { display: grid; gap: 12px; }

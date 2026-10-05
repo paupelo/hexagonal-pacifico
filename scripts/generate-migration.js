@@ -136,6 +136,21 @@ UPDATE ediciones SET info = ${q(JSON.stringify(ed.info))}::jsonb WHERE slug = ${
   WHERE edicion_id = ${eid} AND match_key = ${q(p.key)}
     AND home_goals IS NULL AND away_goals IS NULL;`);
       }
+      if (p.goleadores && p.goleadores.length) {
+        // Los goleadores de un partido solo se siembran si ese partido aún no
+        // tiene ninguno (no duplica en reinicios ni pisa lo que cargue el admin).
+        const pid = `(SELECT id FROM partidos WHERE edicion_id = ${eid} AND match_key = ${q(p.key)})`;
+        const values = p.goleadores
+          .map((g) => `(${q(g.player)}, ${q(g.equipo)}, ${g.goals})`)
+          .join(',\n          ');
+        out.push(`INSERT INTO goleadores (player, team, goals, edicion_id, partido_id, equipo_id)
+  SELECT v.player, v.team, v.goals, ${eid}, ${pid},
+         (SELECT id FROM equipos WHERE edicion_id = ${eid} AND nombre = v.team)
+  FROM (VALUES ${values}) AS v(player, team, goals)
+  WHERE NOT EXISTS (
+    SELECT 1 FROM goleadores WHERE edicion_id = ${eid} AND partido_id = ${pid}
+  );`);
+      }
     }
   }
 

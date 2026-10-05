@@ -56,11 +56,32 @@ const EDICIONES = [
       {
         orden: 1, label: 'Jornada 1', fecha: 'Domingo 4 de octubre de 2026', tipo: 'liga',
         partidos: [
-          // Resultados oficiales de la J1 (4/10/2026). Los goleadores quedan
-          // pendientes de confirmar: no se siembra ninguno.
-          { key: 'j1-2', hora: '7:00', home: 'Deportivo Amarillo', away: 'New Generation', resultado: { home: 3, away: 0 } },
-          { key: 'j1-1', hora: '8:15', home: 'Panamá Pacífico Residentes', away: 'La10 West FC', resultado: { home: 1, away: 0 } },
-          { key: 'j1-3', hora: '9:30', home: 'Baviera FC', away: 'Cludsa FC', resultado: { home: 3, away: 2 } },
+          // Resultados y goleadores oficiales de la J1 (4/10/2026).
+          {
+            key: 'j1-2', hora: '7:00', home: 'Deportivo Amarillo', away: 'New Generation',
+            resultado: { home: 3, away: 0 },
+            goleadores: [
+              { player: 'Omar Anderson', equipo: 'Deportivo Amarillo', goals: 1 },
+              { player: 'Robinson Zarco', equipo: 'Deportivo Amarillo', goals: 1 },
+              { player: 'Ricardo Dubois', equipo: 'Deportivo Amarillo', goals: 1 },
+            ],
+          },
+          {
+            key: 'j1-1', hora: '8:15', home: 'Panamá Pacífico Residentes', away: 'La10 West FC',
+            resultado: { home: 1, away: 0 },
+            goleadores: [
+              { player: 'Iñigo Lanz', equipo: 'Panamá Pacífico Residentes', goals: 1 },
+            ],
+          },
+          {
+            key: 'j1-3', hora: '9:30', home: 'Baviera FC', away: 'Cludsa FC',
+            resultado: { home: 3, away: 2 },
+            goleadores: [
+              { player: 'Felipe Olivardia', equipo: 'Baviera FC', goals: 2 },
+              { player: 'Blas Garrido', equipo: 'Baviera FC', goals: 1 },
+              { player: 'Julio Jackson', equipo: 'Cludsa FC', goals: 2 },
+            ],
+          },
         ],
       },
       {
