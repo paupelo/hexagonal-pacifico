@@ -58,7 +58,7 @@ const EDICIONES = [
         partidos: [
           // Resultados oficiales de la J1 (4/10/2026). Los goleadores quedan
           // pendientes de confirmar: no se siembra ninguno.
-          { key: 'j1-2', hora: '7:00', home: 'Deportivo Amarillo', away: 'New Generation', resultado: { home: 2, away: 0 } },
+          { key: 'j1-2', hora: '7:00', home: 'Deportivo Amarillo', away: 'New Generation', resultado: { home: 3, away: 0 } },
           { key: 'j1-1', hora: '8:15', home: 'Panamá Pacífico Residentes', away: 'La10 West FC', resultado: { home: 1, away: 0 } },
           { key: 'j1-3', hora: '9:30', home: 'Baviera FC', away: 'Cludsa FC', resultado: { home: 3, away: 2 } },
         ],

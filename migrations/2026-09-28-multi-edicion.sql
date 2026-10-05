@@ -120,7 +120,7 @@ INSERT INTO jornadas (edicion_id, orden, label, fecha, tipo, nota)
 INSERT INTO partidos (edicion_id, jornada_id, match_key, hora, home_equipo_id, away_equipo_id, home_label, away_label)
   SELECT (SELECT id FROM ediciones WHERE slug = '2026-oct-nov'), (SELECT id FROM jornadas WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND orden = 1), 'j1-2', '7:00', (SELECT id FROM equipos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND nombre = 'Deportivo Amarillo'), (SELECT id FROM equipos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND nombre = 'New Generation'), NULL, NULL
   WHERE NOT EXISTS (SELECT 1 FROM partidos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND match_key = 'j1-2');
-UPDATE partidos SET home_goals = 2, away_goals = 0
+UPDATE partidos SET home_goals = 3, away_goals = 0
   WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND match_key = 'j1-2'
     AND home_goals IS NULL AND away_goals IS NULL;
 INSERT INTO partidos (edicion_id, jornada_id, match_key, hora, home_equipo_id, away_equipo_id, home_label, away_label)
