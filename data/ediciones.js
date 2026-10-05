@@ -37,7 +37,11 @@ const EDICIONES = [
         'Diferencia de goles',
         'Goles a favor',
         'Enfrentamiento directo',
-        'Orden alfabético',
+        'Tarjetas rojas: en caso de persistir el empate, se clasificará por delante el equipo con menos expulsiones acumuladas en el torneo (roja directa o doble amarilla).',
+      ],
+      disciplina: [
+        'Tarjeta roja directa: el jugador es expulsado del partido y cumplirá un partido de suspensión, que será el siguiente encuentro que dispute su equipo.',
+        'Doble amarilla: el jugador es expulsado del partido en curso, pero no acarrea suspensión adicional; podrá jugar el siguiente encuentro.',
       ],
     },
     equipos: [
@@ -52,9 +56,11 @@ const EDICIONES = [
       {
         orden: 1, label: 'Jornada 1', fecha: 'Domingo 4 de octubre de 2026', tipo: 'liga',
         partidos: [
-          { key: 'j1-2', hora: '7:00', home: 'Deportivo Amarillo', away: 'New Generation' },
-          { key: 'j1-1', hora: '8:15', home: 'Panamá Pacífico Residentes', away: 'La10 West FC' },
-          { key: 'j1-3', hora: '9:30', home: 'Baviera FC', away: 'Cludsa FC' },
+          // Resultados oficiales de la J1 (4/10/2026). Los goleadores quedan
+          // pendientes de confirmar: no se siembra ninguno.
+          { key: 'j1-2', hora: '7:00', home: 'Deportivo Amarillo', away: 'New Generation', resultado: { home: 2, away: 0 } },
+          { key: 'j1-1', hora: '8:15', home: 'Panamá Pacífico Residentes', away: 'La10 West FC', resultado: { home: 1, away: 0 } },
+          { key: 'j1-3', hora: '9:30', home: 'Baviera FC', away: 'Cludsa FC', resultado: { home: 3, away: 2 } },
         ],
       },
       {
@@ -107,6 +113,10 @@ const EDICIONES = [
           { key: 'final', hora: '8:00', homeLabel: 'Ganador Semifinal 1', awayLabel: 'Ganador Semifinal 2' },
         ],
       },
+    ],
+    // Expulsiones oficiales (cuentan para el 5º criterio de desempate).
+    expulsiones: [
+      { partido: 'j1-1', equipo: 'La10 West FC', tipo: 'doble-amarilla', jugador: null },
     ],
   },
 ];

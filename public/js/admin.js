@@ -67,6 +67,8 @@ async function loadData() {
   renderResults();
   renderScorerForm();
   renderScorers();
+  renderCardForm();
+  renderCards();
   renderTeams();
   renderEditions();
   await renderBuilder();
@@ -133,6 +135,41 @@ function renderScorers() {
         <td style="text-align:left">${p ? escapeHtml(matchLabel(p)) : '—'}</td>
         <td>${g.goals}</td>
         <td><button class="row-del" data-del-scorer="${g.id}">Eliminar</button></td>
+      </tr>`;
+    })
+    .join('');
+}
+
+function renderCardForm() {
+  $('#cardTeam').innerHTML = DATA.equipos
+    .map((e) => `<option value="${e.id}">${escapeHtml(e.nombre)}</option>`)
+    .join('');
+  $('#cardMatch').innerHTML =
+    '<option value="">— Sin partido —</option>' +
+    DATA.partidos
+      .filter((p) => p.jornada_tipo !== 'descanso')
+      .map((p) => `<option value="${p.id}">${escapeHtml(matchLabel(p))}</option>`)
+      .join('');
+}
+
+function renderCards() {
+  const body = $('#adminCardsBody');
+  const expulsiones = DATA.expulsiones || [];
+  if (!expulsiones.length) {
+    body.innerHTML = `<tr><td colspan="5" style="color:var(--muted-3)">Sin expulsiones.</td></tr>`;
+    return;
+  }
+  const partidosById = new Map(DATA.partidos.map((p) => [p.id, p]));
+  body.innerHTML = expulsiones
+    .map((x) => {
+      const p = x.partido_id ? partidosById.get(x.partido_id) : null;
+      return `
+      <tr>
+        <td style="text-align:left">${escapeHtml(x.equipo_nombre)}</td>
+        <td style="text-align:left">${p ? escapeHtml(matchLabel(p)) : '—'}</td>
+        <td>🟥 ${x.tipo === 'doble-amarilla' ? 'Doble amarilla' : 'Roja directa'}</td>
+        <td style="text-align:left">${escapeHtml(x.jugador || '—')}</td>
+        <td><button class="row-del" data-del-card="${x.id}">Eliminar</button></td>
       </tr>`;
     })
     .join('');
@@ -304,6 +341,33 @@ function initEvents() {
     if (!confirm('¿Eliminar este goleador?')) return;
     try {
       await api('DELETE', '/api/admin/goleadores/' + id);
+      await loadData();
+    } catch (err) { handleError(err); }
+  });
+
+  // Expulsiones
+  $('#cardForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const msg = $('#cardMsg');
+    try {
+      await api('POST', '/api/admin/expulsiones', {
+        equipoId: $('#cardTeam').value,
+        partidoId: $('#cardMatch').value || null,
+        tipo: $('#cardType').value,
+        jugador: $('#cardPlayer').value || null,
+      });
+      $('#cardPlayer').value = '';
+      setMsg(msg, 'Expulsión registrada.', true);
+      await loadData();
+    } catch (err) { handleError(err, msg); }
+  });
+
+  $('#adminCardsBody').addEventListener('click', async (e) => {
+    const id = e.target.getAttribute('data-del-card');
+    if (!id) return;
+    if (!confirm('¿Eliminar esta expulsión?')) return;
+    try {
+      await api('DELETE', '/api/admin/expulsiones/' + id);
       await loadData();
     } catch (err) { handleError(err); }
   });

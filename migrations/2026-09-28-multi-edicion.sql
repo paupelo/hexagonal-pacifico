@@ -78,11 +78,24 @@ CREATE TABLE IF NOT EXISTS logos (
   data TEXT NOT NULL
 );
 
+-- Expulsiones por equipo y partido, distinguiendo roja directa de doble
+-- amarilla. Cuentan para el 5º criterio de desempate de la clasificación.
+CREATE TABLE IF NOT EXISTS expulsiones (
+  id         SERIAL PRIMARY KEY,
+  edicion_id INTEGER NOT NULL REFERENCES ediciones(id),
+  partido_id INTEGER REFERENCES partidos(id),
+  equipo_id  INTEGER NOT NULL REFERENCES equipos(id),
+  jugador    TEXT,
+  tipo       TEXT NOT NULL CHECK (tipo IN ('roja', 'doble-amarilla'))
+);
+
 
 -- Edición Hexagonal Panamá Pacífico – Octubre-Noviembre 2026
 INSERT INTO ediciones (nombre, nombre_corto, slug, fecha_inicio, fecha_fin, activa, archivada, info)
-  SELECT 'Hexagonal Panamá Pacífico – Octubre-Noviembre 2026', 'Octubre-Noviembre 2026', '2026-oct-nov', '2026-10-04', '2026-11-29', true, false, '{"sede":"Sport Park, Panamá Pacífico (cancha F11)","dias":"Domingos por la mañana","turnos":["Turno 1 · 7:00 – 8:00","Turno 2 · 8:15 – 9:15","Turno 3 · 9:30 – 10:30"],"formato":["Liguilla todos contra todos a una sola vuelta: 5 jornadas, 3 partidos por jornada, 15 partidos.","Clasifican los 4 primeros a semifinales: 1º vs 4º y 2º vs 3º.","Final entre los ganadores de las semifinales. No hay partido por el tercer puesto.","Sin partidos el 1 y el 8 de noviembre (Fiestas Patrias).","En caso de empate en semifinales o final, el partido se decide por penaltis."],"desempate":["Puntos (victoria 3, empate 1, derrota 0)","Diferencia de goles","Goles a favor","Enfrentamiento directo","Orden alfabético"]}'::jsonb
+  SELECT 'Hexagonal Panamá Pacífico – Octubre-Noviembre 2026', 'Octubre-Noviembre 2026', '2026-oct-nov', '2026-10-04', '2026-11-29', true, false, '{"sede":"Sport Park, Panamá Pacífico (cancha F11)","dias":"Domingos por la mañana","turnos":["Turno 1 · 7:00 – 8:00","Turno 2 · 8:15 – 9:15","Turno 3 · 9:30 – 10:30"],"formato":["Liguilla todos contra todos a una sola vuelta: 5 jornadas, 3 partidos por jornada, 15 partidos.","Clasifican los 4 primeros a semifinales: 1º vs 4º y 2º vs 3º.","Final entre los ganadores de las semifinales. No hay partido por el tercer puesto.","Sin partidos el 1 y el 8 de noviembre (Fiestas Patrias).","En caso de empate en semifinales o final, el partido se decide por penaltis."],"desempate":["Puntos (victoria 3, empate 1, derrota 0)","Diferencia de goles","Goles a favor","Enfrentamiento directo","Tarjetas rojas: en caso de persistir el empate, se clasificará por delante el equipo con menos expulsiones acumuladas en el torneo (roja directa o doble amarilla)."],"disciplina":["Tarjeta roja directa: el jugador es expulsado del partido y cumplirá un partido de suspensión, que será el siguiente encuentro que dispute su equipo.","Doble amarilla: el jugador es expulsado del partido en curso, pero no acarrea suspensión adicional; podrá jugar el siguiente encuentro."]}'::jsonb
   WHERE NOT EXISTS (SELECT 1 FROM ediciones WHERE slug = '2026-oct-nov');
+-- El bloque de normas (info) lo gobierna el código: se actualiza siempre.
+UPDATE ediciones SET info = '{"sede":"Sport Park, Panamá Pacífico (cancha F11)","dias":"Domingos por la mañana","turnos":["Turno 1 · 7:00 – 8:00","Turno 2 · 8:15 – 9:15","Turno 3 · 9:30 – 10:30"],"formato":["Liguilla todos contra todos a una sola vuelta: 5 jornadas, 3 partidos por jornada, 15 partidos.","Clasifican los 4 primeros a semifinales: 1º vs 4º y 2º vs 3º.","Final entre los ganadores de las semifinales. No hay partido por el tercer puesto.","Sin partidos el 1 y el 8 de noviembre (Fiestas Patrias).","En caso de empate en semifinales o final, el partido se decide por penaltis."],"desempate":["Puntos (victoria 3, empate 1, derrota 0)","Diferencia de goles","Goles a favor","Enfrentamiento directo","Tarjetas rojas: en caso de persistir el empate, se clasificará por delante el equipo con menos expulsiones acumuladas en el torneo (roja directa o doble amarilla)."],"disciplina":["Tarjeta roja directa: el jugador es expulsado del partido y cumplirá un partido de suspensión, que será el siguiente encuentro que dispute su equipo.","Doble amarilla: el jugador es expulsado del partido en curso, pero no acarrea suspensión adicional; podrá jugar el siguiente encuentro."]}'::jsonb WHERE slug = '2026-oct-nov';
 INSERT INTO equipos (edicion_id, nombre, logo_url)
   SELECT (SELECT id FROM ediciones WHERE slug = '2026-oct-nov'), 'Cludsa FC', '/escudos/cludsa.jpeg'
   WHERE NOT EXISTS (SELECT 1 FROM equipos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND nombre = 'Cludsa FC');
@@ -107,12 +120,21 @@ INSERT INTO jornadas (edicion_id, orden, label, fecha, tipo, nota)
 INSERT INTO partidos (edicion_id, jornada_id, match_key, hora, home_equipo_id, away_equipo_id, home_label, away_label)
   SELECT (SELECT id FROM ediciones WHERE slug = '2026-oct-nov'), (SELECT id FROM jornadas WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND orden = 1), 'j1-2', '7:00', (SELECT id FROM equipos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND nombre = 'Deportivo Amarillo'), (SELECT id FROM equipos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND nombre = 'New Generation'), NULL, NULL
   WHERE NOT EXISTS (SELECT 1 FROM partidos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND match_key = 'j1-2');
+UPDATE partidos SET home_goals = 2, away_goals = 0
+  WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND match_key = 'j1-2'
+    AND home_goals IS NULL AND away_goals IS NULL;
 INSERT INTO partidos (edicion_id, jornada_id, match_key, hora, home_equipo_id, away_equipo_id, home_label, away_label)
   SELECT (SELECT id FROM ediciones WHERE slug = '2026-oct-nov'), (SELECT id FROM jornadas WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND orden = 1), 'j1-1', '8:15', (SELECT id FROM equipos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND nombre = 'Panamá Pacífico Residentes'), (SELECT id FROM equipos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND nombre = 'La10 West FC'), NULL, NULL
   WHERE NOT EXISTS (SELECT 1 FROM partidos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND match_key = 'j1-1');
+UPDATE partidos SET home_goals = 1, away_goals = 0
+  WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND match_key = 'j1-1'
+    AND home_goals IS NULL AND away_goals IS NULL;
 INSERT INTO partidos (edicion_id, jornada_id, match_key, hora, home_equipo_id, away_equipo_id, home_label, away_label)
   SELECT (SELECT id FROM ediciones WHERE slug = '2026-oct-nov'), (SELECT id FROM jornadas WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND orden = 1), 'j1-3', '9:30', (SELECT id FROM equipos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND nombre = 'Baviera FC'), (SELECT id FROM equipos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND nombre = 'Cludsa FC'), NULL, NULL
   WHERE NOT EXISTS (SELECT 1 FROM partidos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND match_key = 'j1-3');
+UPDATE partidos SET home_goals = 3, away_goals = 2
+  WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND match_key = 'j1-3'
+    AND home_goals IS NULL AND away_goals IS NULL;
 INSERT INTO jornadas (edicion_id, orden, label, fecha, tipo, nota)
   SELECT (SELECT id FROM ediciones WHERE slug = '2026-oct-nov'), 2, 'Jornada 2', 'Domingo 11 de octubre de 2026', 'liga', NULL
   WHERE NOT EXISTS (SELECT 1 FROM jornadas WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND orden = 2);
@@ -179,5 +201,11 @@ INSERT INTO jornadas (edicion_id, orden, label, fecha, tipo, nota)
 INSERT INTO partidos (edicion_id, jornada_id, match_key, hora, home_equipo_id, away_equipo_id, home_label, away_label)
   SELECT (SELECT id FROM ediciones WHERE slug = '2026-oct-nov'), (SELECT id FROM jornadas WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND orden = 8), 'final', '8:00', NULL, NULL, 'Ganador Semifinal 1', 'Ganador Semifinal 2'
   WHERE NOT EXISTS (SELECT 1 FROM partidos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND match_key = 'final');
+INSERT INTO expulsiones (edicion_id, partido_id, equipo_id, jugador, tipo)
+  SELECT (SELECT id FROM ediciones WHERE slug = '2026-oct-nov'), (SELECT id FROM partidos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND match_key = 'j1-1'), (SELECT id FROM equipos  WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND nombre = 'La10 West FC'), NULL, 'doble-amarilla'
+  WHERE NOT EXISTS (
+    SELECT 1 FROM expulsiones
+    WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND partido_id = (SELECT id FROM partidos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND match_key = 'j1-1') AND equipo_id = (SELECT id FROM equipos  WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND nombre = 'La10 West FC') AND tipo = 'doble-amarilla'
+  );
 
 COMMIT;

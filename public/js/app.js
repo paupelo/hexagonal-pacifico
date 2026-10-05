@@ -101,6 +101,16 @@ function scorersOf(data, partidoId, equipoId) {
     .join('')}</ul>`;
 }
 
+function expulsionesOf(data, partidoId, equipoId) {
+  const list = (data.expulsiones || []).filter(
+    (x) => x.partido_id === partidoId && x.equipo_id === equipoId
+  );
+  if (!list.length) return '';
+  return `<ul class="match-scorers">${list
+    .map((x) => `<li>🟥 ${x.jugador ? `${escapeHtml(x.jugador)} ` : ''}${x.tipo === 'doble-amarilla' ? '(doble amarilla)' : '(roja directa)'}</li>`)
+    .join('')}</ul>`;
+}
+
 function renderSchedule(data) {
   $('#calendarioSub').textContent = (data.edicion.info || {}).dias || '';
   $('#scheduleWrap').innerHTML = data.jornadas
@@ -122,7 +132,7 @@ function renderSchedule(data) {
               <div class="match-team">
                 ${badge(s, { large: true })}
                 <span class="name ${s.nombre ? '' : 'placeholder'}">${escapeHtml(s.nombre || s.placeholder || '—')}</span>
-                ${s.equipo_id ? scorersOf(data, p.id, s.equipo_id) : ''}
+                ${s.equipo_id ? scorersOf(data, p.id, s.equipo_id) + expulsionesOf(data, p.id, s.equipo_id) : ''}
               </div>`;
             return `
               <div class="match-card ${j.partidos.length === 1 ? 'solo' : ''}">
@@ -179,6 +189,7 @@ function renderFormat(data) {
     card('Formato', info.formato) +
     card('Horarios', info.turnos) +
     card('Criterios de desempate', info.desempate, true) +
+    card('Régimen disciplinario', info.disciplina) +
     card('Sede y días', [info.sede, info.dias].filter(Boolean));
 }
 

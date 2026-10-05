@@ -82,11 +82,12 @@ function ganadorId(p) {
 }
 
 async function buildEdicionPayload(edicion) {
-  const [equipos, jornadas, partidos, goleadores] = await Promise.all([
+  const [equipos, jornadas, partidos, goleadores, expulsiones] = await Promise.all([
     store.getEquipos(edicion.id),
     store.getJornadas(edicion.id),
     store.getPartidos(edicion.id),
     store.getGoleadores(edicion.id),
+    store.getExpulsiones(edicion.id),
   ]);
 
   const equiposById = new Map(equipos.map((e) => [e.id, e]));
@@ -96,7 +97,7 @@ async function buildEdicionPayload(edicion) {
 
   // Clasificación: cálculo con los criterios vigentes; si la edición tiene la
   // posición final congelada (ediciones archivadas), ese orden manda.
-  let clasificacion = computeStandings(equipos, liga);
+  let clasificacion = computeStandings(equipos, liga, expulsiones);
   const congelada = equipos.length > 0 && equipos.every((e) => e.posicion_final);
   if (congelada) {
     const posByEquipo = new Map(equipos.map((e) => [e.id, e.posicion_final]));
@@ -194,6 +195,13 @@ async function buildEdicionPayload(edicion) {
     liga_completa: ligaCompleta,
     jornadas: jornadasPayload,
     goleadores: goleadoresPayload,
+    expulsiones: expulsiones.map((x) => ({
+      id: x.id,
+      partido_id: x.partido_id,
+      equipo_id: x.equipo_id,
+      jugador: x.jugador,
+      tipo: x.tipo,
+    })),
     goleadores_detalle: goleadores.map((g) => ({
       ...g,
       partido_label: g.partido_id && partidosById.has(g.partido_id)
@@ -339,11 +347,12 @@ app.get('/api/admin/data', requireAdmin, async (req, res) => {
   try {
     const activa = await getActivaOr503(res);
     if (!activa) return;
-    const [equipos, jornadas, partidos, goleadores, ediciones] = await Promise.all([
+    const [equipos, jornadas, partidos, goleadores, expulsiones, ediciones] = await Promise.all([
       store.getEquipos(activa.id),
       store.getJornadas(activa.id),
       store.getPartidos(activa.id),
       store.getGoleadores(activa.id),
+      store.getExpulsiones(activa.id),
       store.getEdiciones(),
     ]);
     const equiposById = new Map(equipos.map((e) => [e.id, e]));
@@ -359,6 +368,10 @@ app.get('/api/admin/data', requireAdmin, async (req, res) => {
       goleadores: goleadores.map((g) => ({
         ...g,
         equipo_nombre: g.equipo_id ? (equiposById.get(g.equipo_id) || {}).nombre : g.legacy_team,
+      })),
+      expulsiones: expulsiones.map((x) => ({
+        ...x,
+        equipo_nombre: (equiposById.get(x.equipo_id) || {}).nombre || '—',
       })),
       ediciones: ediciones.map((e) => ({
         id: e.id, nombre: e.nombre, slug: e.slug, activa: e.activa, archivada: e.archivada,
@@ -480,6 +493,55 @@ app.delete('/api/admin/goleadores/:id', requireAdmin, async (req, res) => {
   }
 });
 
+app.post('/api/admin/expulsiones', requireAdmin, async (req, res) => {
+  try {
+    const activa = await getActivaOr503(res);
+    if (!activa) return;
+    const { equipoId, partidoId, jugador, tipo } = req.body || {};
+    if (!['roja', 'doble-amarilla'].includes(tipo)) {
+      return res.status(400).json({ error: 'Tipo de expulsión inválido (roja o doble-amarilla).' });
+    }
+    const equipo = await store.getEquipo(equipoId);
+    if (!equipo || String(equipo.edicion_id) !== String(activa.id)) {
+      return res.status(400).json({ error: 'El equipo no pertenece a la edición activa.' });
+    }
+    let partido = null;
+    if (partidoId) {
+      partido = await store.getPartido(partidoId);
+      if (!partido || String(partido.edicion_id) !== String(activa.id)) {
+        return res.status(400).json({ error: 'El partido no pertenece a la edición activa.' });
+      }
+    }
+    const id = await store.addExpulsion({
+      edicionId: activa.id,
+      partidoId: partido ? partido.id : null,
+      equipoId: equipo.id,
+      jugador: jugador ? String(jugador).trim() : null,
+      tipo,
+    });
+    res.json({ ok: true, id });
+  } catch (err) {
+    console.error('Error añadiendo expulsión:', err);
+    res.status(500).json({ error: 'Error al registrar la expulsión' });
+  }
+});
+
+app.delete('/api/admin/expulsiones/:id', requireAdmin, async (req, res) => {
+  try {
+    const activa = await getActivaOr503(res);
+    if (!activa) return;
+    const expulsion = await store.getExpulsion(req.params.id);
+    if (!expulsion || String(expulsion.edicion_id) !== String(activa.id)) {
+      return res.status(400).json({ error: 'La expulsión no pertenece a la edición activa.' });
+    }
+    await store.deleteExpulsion(expulsion.id);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Error borrando expulsión:', err);
+    res.status(500).json({ error: 'Error al borrar la expulsión' });
+  }
+});
+
 app.put('/api/admin/equipos/:id', requireAdmin, async (req, res) => {
   try {
     const activa = await getActivaOr503(res);
@@ -561,8 +623,9 @@ app.post('/api/admin/ediciones/:id/archivar', requireAdmin, async (req, res) => 
     if (!edicion) return res.status(404).json({ error: 'Edición no encontrada' });
     const equipos = await store.getEquipos(edicion.id);
     const partidos = await store.getPartidos(edicion.id);
+    const expulsiones = await store.getExpulsiones(edicion.id);
     const liga = partidos.filter((p) => p.jornada_tipo === 'liga');
-    const standings = computeStandings(equipos, liga);
+    const standings = computeStandings(equipos, liga, expulsiones);
     await store.setPosicionesFinales(standings.map((r) => ({ equipoId: r.equipo_id, pos: r.pos })));
     await store.archivarEdicion(edicion.id);
     res.json({ ok: true });

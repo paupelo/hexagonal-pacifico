@@ -44,6 +44,7 @@
     <div class="admin-tabs">
       <button class="atab active" data-tab="resultados">Resultados</button>
       <button class="atab" data-tab="goleadores">Goleadores</button>
+      <button class="atab" data-tab="tarjetas">Tarjetas</button>
       <button class="atab" data-tab="equipos">Equipos</button>
       <button class="atab" data-tab="ediciones">Ediciones</button>
     </div>
@@ -82,6 +83,38 @@
           <table class="admin-table">
             <thead><tr><th class="col-left">Jugador</th><th class="col-left">Equipo</th><th class="col-left">Partido</th><th>Goles</th><th></th></tr></thead>
             <tbody id="adminScorersBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TARJETAS -->
+    <section class="atab-panel" id="tab-tarjetas" hidden>
+      <div class="admin-card">
+        <h3>Registrar expulsión</h3>
+        <p class="admin-note">Cuentan para el 5º criterio de desempate tanto la roja directa como la doble amarilla. El jugador es opcional si aún no está identificado.</p>
+        <form id="cardForm" class="admin-form">
+          <div class="row">
+            <select id="cardTeam" class="input"></select>
+            <select id="cardMatch" class="input"></select>
+          </div>
+          <div class="row">
+            <select id="cardType" class="input">
+              <option value="doble-amarilla">Doble amarilla</option>
+              <option value="roja">Roja directa</option>
+            </select>
+            <input type="text" id="cardPlayer" class="input" placeholder="Jugador (opcional)" />
+          </div>
+          <div class="row"><button type="submit" class="btn btn-primary btn-sm">Registrar</button></div>
+          <span id="cardMsg" class="form-msg"></span>
+        </form>
+      </div>
+      <div class="admin-card">
+        <h3>Expulsiones registradas</h3>
+        <div class="table-wrap">
+          <table class="admin-table">
+            <thead><tr><th class="col-left">Equipo</th><th class="col-left">Partido</th><th>Tipo</th><th class="col-left">Jugador</th><th></th></tr></thead>
+            <tbody id="adminCardsBody"></tbody>
           </table>
         </div>
       </div>

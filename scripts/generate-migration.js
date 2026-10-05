@@ -91,6 +91,17 @@ CREATE TABLE IF NOT EXISTS logos (
   mime TEXT NOT NULL,
   data TEXT NOT NULL
 );
+
+-- Expulsiones por equipo y partido, distinguiendo roja directa de doble
+-- amarilla. Cuentan para el 5º criterio de desempate de la clasificación.
+CREATE TABLE IF NOT EXISTS expulsiones (
+  id         SERIAL PRIMARY KEY,
+  edicion_id INTEGER NOT NULL REFERENCES ediciones(id),
+  partido_id INTEGER REFERENCES partidos(id),
+  equipo_id  INTEGER NOT NULL REFERENCES equipos(id),
+  jugador    TEXT,
+  tipo       TEXT NOT NULL CHECK (tipo IN ('roja', 'doble-amarilla'))
+);
 `);
 
 for (const ed of EDICIONES) {
@@ -99,7 +110,9 @@ for (const ed of EDICIONES) {
 -- Edición ${ed.nombre}
 INSERT INTO ediciones (nombre, nombre_corto, slug, fecha_inicio, fecha_fin, activa, archivada, info)
   SELECT ${q(ed.nombre)}, ${q(ed.nombreCorto)}, ${q(ed.slug)}, ${q(ed.fechaInicio)}, ${q(ed.fechaFin)}, ${ed.activa}, ${ed.archivada}, ${q(JSON.stringify(ed.info))}::jsonb
-  WHERE NOT EXISTS (SELECT 1 FROM ediciones WHERE slug = ${q(ed.slug)});`);
+  WHERE NOT EXISTS (SELECT 1 FROM ediciones WHERE slug = ${q(ed.slug)});
+-- El bloque de normas (info) lo gobierna el código: se actualiza siempre.
+UPDATE ediciones SET info = ${q(JSON.stringify(ed.info))}::jsonb WHERE slug = ${q(ed.slug)};`);
 
   for (const t of ed.equipos) {
     out.push(`INSERT INTO equipos (edicion_id, nombre, logo_url)
@@ -117,7 +130,24 @@ INSERT INTO ediciones (nombre, nombre_corto, slug, fecha_inicio, fecha_fin, acti
       out.push(`INSERT INTO partidos (edicion_id, jornada_id, match_key, hora, home_equipo_id, away_equipo_id, home_label, away_label)
   SELECT ${eid}, (SELECT id FROM jornadas WHERE edicion_id = ${eid} AND orden = ${j.orden}), ${q(p.key)}, ${q(p.hora)}, ${homeId}, ${awayId}, ${q(p.homeLabel || null)}, ${q(p.awayLabel || null)}
   WHERE NOT EXISTS (SELECT 1 FROM partidos WHERE edicion_id = ${eid} AND match_key = ${q(p.key)});`);
+      if (p.resultado) {
+        // Solo rellena marcadores vacíos: nunca pisa lo guardado por el admin.
+        out.push(`UPDATE partidos SET home_goals = ${p.resultado.home}, away_goals = ${p.resultado.away}
+  WHERE edicion_id = ${eid} AND match_key = ${q(p.key)}
+    AND home_goals IS NULL AND away_goals IS NULL;`);
+      }
     }
+  }
+
+  for (const x of ed.expulsiones || []) {
+    const pid = `(SELECT id FROM partidos WHERE edicion_id = ${eid} AND match_key = ${q(x.partido)})`;
+    const qid = `(SELECT id FROM equipos  WHERE edicion_id = ${eid} AND nombre = ${q(x.equipo)})`;
+    out.push(`INSERT INTO expulsiones (edicion_id, partido_id, equipo_id, jugador, tipo)
+  SELECT ${eid}, ${pid}, ${qid}, ${q(x.jugador || null)}, ${q(x.tipo)}
+  WHERE NOT EXISTS (
+    SELECT 1 FROM expulsiones
+    WHERE edicion_id = ${eid} AND partido_id = ${pid} AND equipo_id = ${qid} AND tipo = ${q(x.tipo)}
+  );`);
   }
 }
 

@@ -152,6 +152,8 @@ sobre la edición **activa**, salvo la gestión de ediciones):
 | `DELETE` | `/api/admin/resultados/:partidoId`    | Borra un marcador.                             |
 | `POST`   | `/api/admin/goleadores`               | Añade un goleador.                             |
 | `DELETE` | `/api/admin/goleadores/:id`           | Elimina un goleador.                           |
+| `POST`   | `/api/admin/expulsiones`              | Registra una expulsión (roja o doble amarilla).|
+| `DELETE` | `/api/admin/expulsiones/:id`          | Elimina una expulsión.                         |
 | `PUT`    | `/api/admin/equipos/:id`              | Edita nombre y logo de un equipo.              |
 | `POST`   | `/api/admin/equipos/:id/logo`         | Sube el escudo de un equipo (base64).          |
 | `POST`   | `/api/admin/ediciones`                | Crea una edición nueva.                        |
