@@ -361,7 +361,7 @@ tr.qualify .pos-cell { color: var(--accent); }
 /* Tabla sin scroll interno: columnas fijas y elipsis en nombres largos,
    para que cada goleador ocupe siempre una sola línea. */
 .scorers-table { table-layout: fixed; }
-.scorers-table th:first-child { width: 34px; }
+.scorers-table th:first-child { width: 46px; }
 .scorers-table th:last-child { width: 58px; }
 .scorers-table td { overflow: hidden; text-overflow: ellipsis; }
 .scorer-team { display: flex; align-items: center; gap: 8px; font-weight: 500; color: var(--muted-2); min-width: 0; }
