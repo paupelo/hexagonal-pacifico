@@ -204,7 +204,9 @@ UPDATE partidos SET home_goals = 2, away_goals = 5
 INSERT INTO goleadores (player, team, goals, edicion_id, partido_id, equipo_id)
   SELECT v.player, v.team, v.goals, (SELECT id FROM ediciones WHERE slug = '2026-oct-nov'), (SELECT id FROM partidos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND match_key = 'j2-3'),
          (SELECT id FROM equipos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND nombre = v.team)
-  FROM (VALUES ('Carlos Armien', 'La10 West FC', 1),
+  FROM (VALUES ('Abiel', 'New Generation', 1),
+          ('Ernesto Apolayo', 'New Generation', 1),
+          ('Carlos Armien', 'La10 West FC', 1),
           ('Jonathan Armien', 'La10 West FC', 1),
           ('Edwin Broce', 'La10 West FC', 1),
           ('Joel Palma', 'La10 West FC', 1),

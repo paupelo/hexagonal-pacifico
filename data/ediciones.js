@@ -111,8 +111,9 @@ const EDICIONES = [
           {
             key: 'j2-3', hora: '9:30', home: 'New Generation', away: 'La10 West FC',
             resultado: { home: 2, away: 5 },
-            // Los 2 goles de New Generation quedan PENDIENTES de goleador.
             goleadores: [
+              { player: 'Abiel', equipo: 'New Generation', goals: 1 },
+              { player: 'Ernesto Apolayo', equipo: 'New Generation', goals: 1 },
               { player: 'Carlos Armien', equipo: 'La10 West FC', goals: 1 },
               { player: 'Jonathan Armien', equipo: 'La10 West FC', goals: 1 },
               { player: 'Edwin Broce', equipo: 'La10 West FC', goals: 1 },
