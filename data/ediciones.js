@@ -170,7 +170,8 @@ const EDICIONES = [
     expulsiones: [
       { partido: 'j1-1', equipo: 'La10 West FC', tipo: 'doble-amarilla', jugador: null },
       { partido: 'j2-2', equipo: 'Panamá Pacífico Residentes', tipo: 'roja', jugador: null },
-      { partido: 'j2-2', equipo: 'Panamá Pacífico Residentes', tipo: 'roja', jugador: null },
+      { partido: 'j2-2', equipo: 'Panamá Pacífico Residentes', tipo: 'doble-amarilla', jugador: null },
+      // Baviera: tipo sin confirmar; queda como roja directa salvo aviso.
       { partido: 'j2-2', equipo: 'Baviera FC', tipo: 'roja', jugador: null },
     ],
   },

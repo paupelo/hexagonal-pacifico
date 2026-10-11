@@ -275,7 +275,7 @@ INSERT INTO expulsiones (edicion_id, partido_id, equipo_id, jugador, tipo)
   );
 INSERT INTO expulsiones (edicion_id, partido_id, equipo_id, jugador, tipo)
   SELECT (SELECT id FROM ediciones WHERE slug = '2026-oct-nov'), (SELECT id FROM partidos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND match_key = 'j2-2'), (SELECT id FROM equipos  WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND nombre = 'Panamá Pacífico Residentes'), v.jugador, v.tipo
-  FROM (VALUES (NULL, 'roja'), (NULL, 'roja')) AS v(jugador, tipo)
+  FROM (VALUES (NULL, 'roja'), (NULL, 'doble-amarilla')) AS v(jugador, tipo)
   WHERE NOT EXISTS (
     SELECT 1 FROM expulsiones
     WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND partido_id = (SELECT id FROM partidos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND match_key = 'j2-2') AND equipo_id = (SELECT id FROM equipos  WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND nombre = 'Panamá Pacífico Residentes')
