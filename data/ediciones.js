@@ -87,9 +87,39 @@ const EDICIONES = [
       {
         orden: 2, label: 'Jornada 2', fecha: 'Domingo 11 de octubre de 2026', tipo: 'liga',
         partidos: [
-          { key: 'j2-1', hora: '7:00', home: 'Cludsa FC', away: 'Deportivo Amarillo' },
-          { key: 'j2-2', hora: '8:15', home: 'Panamá Pacífico Residentes', away: 'Baviera FC' },
-          { key: 'j2-3', hora: '9:30', home: 'New Generation', away: 'La10 West FC' },
+          // Resultados y goleadores oficiales de la J2 (11/10/2026).
+          {
+            key: 'j2-1', hora: '7:00', home: 'Cludsa FC', away: 'Deportivo Amarillo',
+            resultado: { home: 1, away: 2 },
+            goleadores: [
+              { player: 'Iansen Carrillo', equipo: 'Cludsa FC', goals: 1 },
+              { player: 'Ángel Lee', equipo: 'Deportivo Amarillo', goals: 1 },
+              { player: 'Jorge Carmichael', equipo: 'Deportivo Amarillo', goals: 1 },
+            ],
+          },
+          {
+            key: 'j2-2', hora: '8:15', home: 'Panamá Pacífico Residentes', away: 'Baviera FC',
+            resultado: { home: 4, away: 3 },
+            goleadores: [
+              { player: 'Francisco Kesseler', equipo: 'Panamá Pacífico Residentes', goals: 2 },
+              { player: 'Harold Chacón', equipo: 'Panamá Pacífico Residentes', goals: 1 },
+              { player: 'Iñigo Lanz', equipo: 'Panamá Pacífico Residentes', goals: 1 },
+              { player: 'Alejandro Garrido', equipo: 'Baviera FC', goals: 2 },
+              { player: 'Benjamin Camacho', equipo: 'Baviera FC', goals: 1 },
+            ],
+          },
+          {
+            key: 'j2-3', hora: '9:30', home: 'New Generation', away: 'La10 West FC',
+            resultado: { home: 2, away: 5 },
+            // Los 2 goles de New Generation quedan PENDIENTES de goleador.
+            goleadores: [
+              { player: 'Carlos Armien', equipo: 'La10 West FC', goals: 1 },
+              { player: 'Jonathan Armien', equipo: 'La10 West FC', goals: 1 },
+              { player: 'Edwin Broce', equipo: 'La10 West FC', goals: 1 },
+              { player: 'Joel Palma', equipo: 'La10 West FC', goals: 1 },
+              { player: 'Ricardo Lopez', equipo: 'La10 West FC', goals: 1 },
+            ],
+          },
         ],
       },
       {
@@ -136,8 +166,12 @@ const EDICIONES = [
       },
     ],
     // Expulsiones oficiales (cuentan para el 5º criterio de desempate).
+    // Las de la J2 van a nivel de equipo (jugadores sin identificar).
     expulsiones: [
       { partido: 'j1-1', equipo: 'La10 West FC', tipo: 'doble-amarilla', jugador: null },
+      { partido: 'j2-2', equipo: 'Panamá Pacífico Residentes', tipo: 'roja', jugador: null },
+      { partido: 'j2-2', equipo: 'Panamá Pacífico Residentes', tipo: 'roja', jugador: null },
+      { partido: 'j2-2', equipo: 'Baviera FC', tipo: 'roja', jugador: null },
     ],
   },
 ];

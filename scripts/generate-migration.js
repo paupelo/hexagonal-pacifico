@@ -154,14 +154,25 @@ UPDATE ediciones SET info = ${q(JSON.stringify(ed.info))}::jsonb WHERE slug = ${
     }
   }
 
+  // Las expulsiones de un mismo equipo en un mismo partido se siembran en
+  // bloque, y solo si ese par partido+equipo aún no tiene ninguna registrada
+  // (permite varias rojas por equipo y partido sin duplicarlas en reinicios).
+  const grupos = new Map();
   for (const x of ed.expulsiones || []) {
-    const pid = `(SELECT id FROM partidos WHERE edicion_id = ${eid} AND match_key = ${q(x.partido)})`;
-    const qid = `(SELECT id FROM equipos  WHERE edicion_id = ${eid} AND nombre = ${q(x.equipo)})`;
+    const k = `${x.partido}|${x.equipo}`;
+    if (!grupos.has(k)) grupos.set(k, []);
+    grupos.get(k).push(x);
+  }
+  for (const xs of grupos.values()) {
+    const pid = `(SELECT id FROM partidos WHERE edicion_id = ${eid} AND match_key = ${q(xs[0].partido)})`;
+    const qid = `(SELECT id FROM equipos  WHERE edicion_id = ${eid} AND nombre = ${q(xs[0].equipo)})`;
+    const values = xs.map((x) => `(${q(x.jugador || null)}, ${q(x.tipo)})`).join(', ');
     out.push(`INSERT INTO expulsiones (edicion_id, partido_id, equipo_id, jugador, tipo)
-  SELECT ${eid}, ${pid}, ${qid}, ${q(x.jugador || null)}, ${q(x.tipo)}
+  SELECT ${eid}, ${pid}, ${qid}, v.jugador, v.tipo
+  FROM (VALUES ${values}) AS v(jugador, tipo)
   WHERE NOT EXISTS (
     SELECT 1 FROM expulsiones
-    WHERE edicion_id = ${eid} AND partido_id = ${pid} AND equipo_id = ${qid} AND tipo = ${q(x.tipo)}
+    WHERE edicion_id = ${eid} AND partido_id = ${pid} AND equipo_id = ${qid}
   );`);
   }
 }

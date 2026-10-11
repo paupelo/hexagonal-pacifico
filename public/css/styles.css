@@ -324,13 +324,22 @@ tr.qualify .pos-cell { color: var(--accent); }
   max-width: 100%;
   min-width: 0;
 }
-/* Cada goleador ocupa exactamente una línea; si no cabe, elipsis. */
+/* Cada goleador ocupa exactamente una línea; si el nombre no cabe se corta
+   con elipsis, pero el contador de goles (×N) nunca se pierde. */
 .match-scorers li {
   line-height: 1.5;
+  display: flex;
+  justify-content: center;
+  gap: 3px;
+  min-width: 0;
+}
+.match-scorers .sn {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-width: 0;
 }
+.match-scorers .sx { flex-shrink: 0; font-weight: 700; }
 .rest-card {
   background: #fff;
   border: 1px dashed var(--line-2);

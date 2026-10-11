@@ -97,7 +97,7 @@ function scorersOf(data, partidoId, equipoId) {
   );
   if (!list.length) return '';
   return `<ul class="match-scorers">${list
-    .map((g) => `<li>⚽ ${escapeHtml(g.player)}${g.goals > 1 ? ` ×${g.goals}` : ''}</li>`)
+    .map((g) => `<li><span class="sn">⚽ ${escapeHtml(g.player)}</span>${g.goals > 1 ? `<span class="sx">×${g.goals}</span>` : ''}</li>`)
     .join('')}</ul>`;
 }
 
