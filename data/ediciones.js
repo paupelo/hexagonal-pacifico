@@ -126,9 +126,38 @@ const EDICIONES = [
       {
         orden: 3, label: 'Jornada 3', fecha: 'Domingo 18 de octubre de 2026', tipo: 'liga',
         partidos: [
-          { key: 'j3-1', hora: '7:00', home: 'Baviera FC', away: 'La10 West FC' },
-          { key: 'j3-2', hora: '8:15', home: 'Panamá Pacífico Residentes', away: 'Deportivo Amarillo' },
-          { key: 'j3-3', hora: '9:30', home: 'Cludsa FC', away: 'New Generation' },
+          // Resultados y goleadores oficiales de la J3 (18/10/2026).
+          {
+            key: 'j3-1', hora: '7:00', home: 'Baviera FC', away: 'La10 West FC',
+            resultado: { home: 7, away: 1 },
+            // El gol de La10 West queda sin goleador informado.
+            goleadores: [
+              { player: 'Felipe Olivardia', equipo: 'Baviera FC', goals: 3 },
+              { player: 'Blas Garrido', equipo: 'Baviera FC', goals: 1 },
+              { player: 'Alejandro Garrido', equipo: 'Baviera FC', goals: 1 },
+              { player: 'Jairo Jiménez', equipo: 'Baviera FC', goals: 1 },
+              { player: 'Ricaurte Cárdenas', equipo: 'Baviera FC', goals: 1 },
+            ],
+          },
+          {
+            key: 'j3-2', hora: '8:15', home: 'Panamá Pacífico Residentes', away: 'Deportivo Amarillo',
+            resultado: { home: 0, away: 6 },
+            goleadores: [
+              { player: 'Jonathan Botacio', equipo: 'Deportivo Amarillo', goals: 3 },
+              { player: 'Cristian Villanueva', equipo: 'Deportivo Amarillo', goals: 2 },
+              { player: 'Simón Isgut', equipo: 'Deportivo Amarillo', goals: 1 },
+            ],
+          },
+          {
+            key: 'j3-3', hora: '9:30', home: 'Cludsa FC', away: 'New Generation',
+            resultado: { home: 4, away: 1 },
+            goleadores: [
+              { player: 'Iansen Carrillo', equipo: 'Cludsa FC', goals: 2 },
+              { player: 'Julio Jackson', equipo: 'Cludsa FC', goals: 1 },
+              { player: 'Eduardo Cárdenas', equipo: 'Cludsa FC', goals: 1 },
+              { player: 'José Lisazauba', equipo: 'New Generation', goals: 1 },
+            ],
+          },
         ],
       },
       {

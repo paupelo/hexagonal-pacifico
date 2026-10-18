@@ -220,12 +220,51 @@ INSERT INTO jornadas (edicion_id, orden, label, fecha, tipo, nota)
 INSERT INTO partidos (edicion_id, jornada_id, match_key, hora, home_equipo_id, away_equipo_id, home_label, away_label)
   SELECT (SELECT id FROM ediciones WHERE slug = '2026-oct-nov'), (SELECT id FROM jornadas WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND orden = 3), 'j3-1', '7:00', (SELECT id FROM equipos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND nombre = 'Baviera FC'), (SELECT id FROM equipos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND nombre = 'La10 West FC'), NULL, NULL
   WHERE NOT EXISTS (SELECT 1 FROM partidos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND match_key = 'j3-1');
+UPDATE partidos SET home_goals = 7, away_goals = 1
+  WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND match_key = 'j3-1'
+    AND home_goals IS NULL AND away_goals IS NULL;
+INSERT INTO goleadores (player, team, goals, edicion_id, partido_id, equipo_id)
+  SELECT v.player, v.team, v.goals, (SELECT id FROM ediciones WHERE slug = '2026-oct-nov'), (SELECT id FROM partidos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND match_key = 'j3-1'),
+         (SELECT id FROM equipos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND nombre = v.team)
+  FROM (VALUES ('Felipe Olivardia', 'Baviera FC', 3),
+          ('Blas Garrido', 'Baviera FC', 1),
+          ('Alejandro Garrido', 'Baviera FC', 1),
+          ('Jairo Jiménez', 'Baviera FC', 1),
+          ('Ricaurte Cárdenas', 'Baviera FC', 1)) AS v(player, team, goals)
+  WHERE NOT EXISTS (
+    SELECT 1 FROM goleadores WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND partido_id = (SELECT id FROM partidos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND match_key = 'j3-1')
+  );
 INSERT INTO partidos (edicion_id, jornada_id, match_key, hora, home_equipo_id, away_equipo_id, home_label, away_label)
   SELECT (SELECT id FROM ediciones WHERE slug = '2026-oct-nov'), (SELECT id FROM jornadas WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND orden = 3), 'j3-2', '8:15', (SELECT id FROM equipos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND nombre = 'Panamá Pacífico Residentes'), (SELECT id FROM equipos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND nombre = 'Deportivo Amarillo'), NULL, NULL
   WHERE NOT EXISTS (SELECT 1 FROM partidos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND match_key = 'j3-2');
+UPDATE partidos SET home_goals = 0, away_goals = 6
+  WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND match_key = 'j3-2'
+    AND home_goals IS NULL AND away_goals IS NULL;
+INSERT INTO goleadores (player, team, goals, edicion_id, partido_id, equipo_id)
+  SELECT v.player, v.team, v.goals, (SELECT id FROM ediciones WHERE slug = '2026-oct-nov'), (SELECT id FROM partidos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND match_key = 'j3-2'),
+         (SELECT id FROM equipos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND nombre = v.team)
+  FROM (VALUES ('Jonathan Botacio', 'Deportivo Amarillo', 3),
+          ('Cristian Villanueva', 'Deportivo Amarillo', 2),
+          ('Simón Isgut', 'Deportivo Amarillo', 1)) AS v(player, team, goals)
+  WHERE NOT EXISTS (
+    SELECT 1 FROM goleadores WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND partido_id = (SELECT id FROM partidos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND match_key = 'j3-2')
+  );
 INSERT INTO partidos (edicion_id, jornada_id, match_key, hora, home_equipo_id, away_equipo_id, home_label, away_label)
   SELECT (SELECT id FROM ediciones WHERE slug = '2026-oct-nov'), (SELECT id FROM jornadas WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND orden = 3), 'j3-3', '9:30', (SELECT id FROM equipos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND nombre = 'Cludsa FC'), (SELECT id FROM equipos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND nombre = 'New Generation'), NULL, NULL
   WHERE NOT EXISTS (SELECT 1 FROM partidos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND match_key = 'j3-3');
+UPDATE partidos SET home_goals = 4, away_goals = 1
+  WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND match_key = 'j3-3'
+    AND home_goals IS NULL AND away_goals IS NULL;
+INSERT INTO goleadores (player, team, goals, edicion_id, partido_id, equipo_id)
+  SELECT v.player, v.team, v.goals, (SELECT id FROM ediciones WHERE slug = '2026-oct-nov'), (SELECT id FROM partidos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND match_key = 'j3-3'),
+         (SELECT id FROM equipos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND nombre = v.team)
+  FROM (VALUES ('Iansen Carrillo', 'Cludsa FC', 2),
+          ('Julio Jackson', 'Cludsa FC', 1),
+          ('Eduardo Cárdenas', 'Cludsa FC', 1),
+          ('José Lisazauba', 'New Generation', 1)) AS v(player, team, goals)
+  WHERE NOT EXISTS (
+    SELECT 1 FROM goleadores WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND partido_id = (SELECT id FROM partidos WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND match_key = 'j3-3')
+  );
 INSERT INTO jornadas (edicion_id, orden, label, fecha, tipo, nota)
   SELECT (SELECT id FROM ediciones WHERE slug = '2026-oct-nov'), 4, 'Jornada 4', 'Domingo 25 de octubre de 2026', 'liga', NULL
   WHERE NOT EXISTS (SELECT 1 FROM jornadas WHERE edicion_id = (SELECT id FROM ediciones WHERE slug = '2026-oct-nov') AND orden = 4);
